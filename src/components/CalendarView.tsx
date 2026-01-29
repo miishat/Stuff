@@ -11,7 +11,7 @@ interface CalendarViewProps {
 
 type CalendarScope = 'project' | 'workspace' | 'all';
 
-const DraggableTask = ({ task, onClick, isDone }: { task: Task; onClick: (task: Task) => void; isDone?: boolean }) => {
+const DraggableTask = ({ task, onClick, isDone, isOverdue }: { task: Task; onClick: (task: Task) => void; isDone?: boolean; isOverdue?: boolean }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: task.id,
         data: { task }
@@ -35,8 +35,10 @@ const DraggableTask = ({ task, onClick, isDone }: { task: Task; onClick: (task: 
                 }
             }}
             className={`px-2 py-1.5 border rounded-md text-[11px] font-medium truncate transition-colors touch-none ${isDone
-                ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-500 opacity-75'
-                : 'bg-brand-50 dark:bg-brand-900/20 border-brand-100 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/40'
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 opacity-75'
+                : isOverdue
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40'
+                    : 'bg-brand-50 dark:bg-brand-900/20 border-brand-100 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/40'
                 }`}
             title={task.title}
         >
@@ -44,6 +46,12 @@ const DraggableTask = ({ task, onClick, isDone }: { task: Task; onClick: (task: 
         </div>
     );
 };
+
+// Let's do DraggableTask first.
+
+// Wait, I can do multi_replace to handle both component def and usages.
+
+/* ... continuing with multi_replace plan ... */
 
 // Droppable Day Component
 const DroppableDay = ({ day, children, dateStr }: { day: number | null; children: React.ReactNode; dateStr?: string }) => {
@@ -246,14 +254,22 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                                 {day}
                                             </div>
                                             <div className="space-y-1.5">
-                                                {visibleTasks.map(task => (
-                                                    <DraggableTask
-                                                        key={task.id}
-                                                        task={task}
-                                                        onClick={onTaskClick}
-                                                        isDone={doneColumn && task.columnId === doneColumn.id}
-                                                    />
-                                                ))}
+                                                {visibleTasks.map(task => {
+                                                    // Use string comparison to avoid timezone issues. isOverdue if task.dueDate < today (YYYY-MM-DD)
+                                                    const today = new Date();
+                                                    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                                                    const isTaskOverdue = task.dueDate && task.dueDate < todayStr;
+
+                                                    return (
+                                                        <DraggableTask
+                                                            key={task.id}
+                                                            task={task}
+                                                            onClick={onTaskClick}
+                                                            isDone={doneColumn && task.columnId === doneColumn.id}
+                                                            isOverdue={!!isTaskOverdue}
+                                                        />
+                                                    );
+                                                })}
                                                 {overflowCount > 0 && (
                                                     <button
                                                         onClick={(e) => {
@@ -293,14 +309,24 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                 </button>
                             </div>
                             <div className="p-3 overflow-y-auto space-y-2">
-                                {getTasksForDay(expandedDay!).tasks.map(task => (
-                                    <div
+                                {getTasksForDay(expandedDay!).tasks.map(task => {
+                                    const isTaskDone = doneColumn && task.columnId === doneColumn.id;
+                                    const today = new Date();
+                                    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                                    const isTaskOverdue = !isTaskDone && task.dueDate && task.dueDate < todayStr;
+
+                                    return (<div
                                         key={task.id}
                                         onClick={() => {
                                             onTaskClick(task);
                                             setExpandedDay(null);
                                         }}
-                                        className="px-3 py-2 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 cursor-pointer hover:border-brand-500 dark:hover:border-brand-500 hover:shadow-sm transition-all flex items-center gap-2"
+                                        className={`px-3 py-2 border rounded-lg text-sm font-medium cursor-pointer hover:shadow-sm transition-all flex items-center gap-2 ${isTaskDone
+                                            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300'
+                                            : isTaskOverdue
+                                                ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 hover:border-red-300 dark:hover:border-red-700'
+                                                : 'bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-brand-500 dark:hover:border-brand-500'
+                                            }`}
                                     >
                                         <div className={`w-2 h-2 rounded-full ${task.priority === 'High' ? 'bg-red-500' :
                                             task.priority === 'Medium' ? 'bg-amber-500' :
@@ -308,7 +334,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                             }`} />
                                         <span className="truncate">{task.title}</span>
                                     </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                             <div className="p-3 bg-slate-50 dark:bg-slate-900/30 border-t border-slate-100 dark:border-slate-800 text-center">
                                 <span className="text-xs text-slate-400 dark:text-slate-500">
