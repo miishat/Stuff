@@ -169,7 +169,7 @@ export const Sidebar: React.FC = () => {
         // Step 1: Name
         openModal({
             type: 'prompt',
-            title: 'New View Name',
+            title: 'New Filter Name',
             message: 'E.g., "High Priority", "Design Tasks"',
             confirmLabel: 'Next',
             onConfirm: (name) => {
@@ -195,7 +195,7 @@ export const Sidebar: React.FC = () => {
                                         ? 'Enter: High, Medium, or Low'
                                         : 'Enter the exact label name (e.g., Marketing):',
                                     defaultValue: type === 'priority' ? 'High' : '',
-                                    confirmLabel: 'Create View',
+                                    confirmLabel: 'Create Filter',
                                     onConfirm: (value) => {
                                         if (value) {
                                             const finalValue = type === 'priority'
@@ -219,8 +219,8 @@ export const Sidebar: React.FC = () => {
         // Step 1: Name
         openModal({
             type: 'prompt',
-            title: 'Edit View Name',
-            message: 'Update the name of your view:',
+            title: 'Edit Filter Name',
+            message: 'Update the name of your filter:',
             defaultValue: view.name,
             confirmLabel: 'Next',
             onConfirm: (newName) => {
@@ -274,8 +274,8 @@ export const Sidebar: React.FC = () => {
         e.stopPropagation();
         openModal({
             type: 'confirm',
-            title: 'Delete View',
-            message: 'Remove this custom view?',
+            title: 'Delete Filter',
+            message: 'Remove this custom filter?',
             confirmLabel: 'Remove',
             onConfirm: () => deleteCustomView(id)
         });
@@ -284,7 +284,7 @@ export const Sidebar: React.FC = () => {
     return (
         <aside
             className={`
-                relative h-full border-r border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl flex flex-col flex-shrink-0 z-30 transition-[width] duration-300 ease-out
+                relative h-full border-r border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl flex flex-col flex-shrink-0 z-30 transition-[width] duration-500 ease-in-out
                 ${isSidebarOpen ? 'w-72' : 'w-20'}
             `}
             style={{ willChange: 'width' }}
@@ -358,10 +358,10 @@ export const Sidebar: React.FC = () => {
                                 onClick={handleAddWorkspace}
                                 className="w-full text-left px-0 py-0 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400 flex items-center transition-colors min-h-[44px]"
                             >
-                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
+                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
                                     <FolderPlus className="w-4 h-4" />
                                 </div>
-                                <div className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>
+                                <div className={`whitespace-nowrap overflow-hidden transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>
                                     Create Workspace
                                 </div>
                             </button>
@@ -371,11 +371,11 @@ export const Sidebar: React.FC = () => {
             </div>
 
             {/* Navigation */}
-            <div className="flex-1 overflow-y-auto py-8 px-4 space-y-8 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto py-8 px-4 space-y-6 scrollbar-hide">
 
                 {/* Workspace Section */}
                 <div className="space-y-1">
-                    <div className={`transition-all duration-300 overflow-hidden ${isSidebarOpen ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
+                    <div className={`transition-all duration-500 overflow-hidden ${isSidebarOpen ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
                         <h3 className="px-4 text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">Projects</h3>
                     </div>
 
@@ -402,7 +402,7 @@ export const Sidebar: React.FC = () => {
                                 )}
 
                                 {/* Icon Container - smooth width transition */}
-                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
+                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
                                     {isSidebarOpen ? (
                                         <button
                                             onClick={(e) => handleChangeProjectIcon(e, project)}
@@ -417,7 +417,7 @@ export const Sidebar: React.FC = () => {
                                 </div>
 
                                 {/* Content - smooth open/close */}
-                                <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                                <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-500 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
                                     <span className="truncate flex-1 text-left font-medium">{project.name}</span>
 
                                     <div className="flex items-center pr-2">
@@ -446,15 +446,20 @@ export const Sidebar: React.FC = () => {
                         className={`w-full flex items-center min-h-[44px] rounded-xl text-sm text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white dark:hover:bg-slate-800 border border-dashed border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 transition-all duration-200 mt-2 p-0 overflow-hidden`}
                         title="Add Project"
                     >
-                        <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
+                        <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
                             <PlusCircle className="w-5 h-5" />
                         </div>
-                        <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>New Project</span>
+                        <span className={`whitespace-nowrap overflow-hidden transition-all duration-500 font-medium ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>New Project</span>
                     </button>
                 </div>
 
-                {/* Recents Section - Independent, not removable */}
+                {/* Filters Section (formerly Custom Views & Recents) */}
                 <div className="space-y-1">
+                    <div className={`transition-all duration-500 overflow-hidden ${isSidebarOpen ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
+                        <h3 className="px-4 text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3 mt-6">Filters</h3>
+                    </div>
+
+                    {/* Recents Filter */}
                     {(() => {
                         const isActive = viewFilter === 'recent';
                         return (
@@ -467,17 +472,16 @@ export const Sidebar: React.FC = () => {
                                 p-0`}
                                 title="Recents"
                             >
-                                {/* Active Glow in Recents */}
                                 {isActive && (
                                     <div className="absolute inset-0 rounded-xl ring-1 ring-brand-500/20 dark:ring-brand-400/20 pointer-events-none"></div>
                                 )}
 
-                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
-                                    <Clock className="w-5 h-5" />
+                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
+                                    <Clock className="w-4 h-4" />
                                 </div>
 
-                                <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                                    <span className="flex-1 font-medium">Recents</span>
+                                <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-500 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                                    <span className="flex-1 font-medium truncate">Recents</span>
                                     <div className="pr-2">
                                         <button
                                             onClick={(e) => {
@@ -497,15 +501,8 @@ export const Sidebar: React.FC = () => {
                             </div>
                         );
                     })()}
-                </div>
 
-                {/* Custom Views Section */}
-                <div className="space-y-1">
-                    <div className={`transition-all duration-300 overflow-hidden ${isSidebarOpen ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
-                        <h3 className="px-4 text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3 mt-6">Views</h3>
-                    </div>
-
-                    {/* Custom Views */}
+                    {/* Custom Filters */}
                     {customViews.map(view => {
                         const isActive = viewFilter === view.id;
                         const Icon = view.filterType === 'priority' ? Flag : Tag;
@@ -532,23 +529,23 @@ export const Sidebar: React.FC = () => {
                                     <div className="absolute inset-0 rounded-xl ring-1 ring-brand-500/20 dark:ring-brand-400/20 pointer-events-none"></div>
                                 )}
 
-                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
+                                <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
                                     <Icon className="w-4 h-4" />
                                 </div>
-                                <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                                <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-500 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
                                     <span className="flex-1 truncate font-medium">{view.name}</span>
                                     <div className="flex items-center ml-auto gap-0.5 pr-2">
                                         <button
                                             onClick={(e) => handleEditView(e, view)}
                                             className={`opacity-0 group-hover:opacity-100 p-1 transition-colors ${isActive ? 'text-brand-400 hover:text-brand-600' : 'text-slate-400 hover:text-brand-600'}`}
-                                            title="Edit View"
+                                            title="Edit Filter"
                                         >
                                             <Pencil className="w-3 h-3 pointer-events-none" />
                                         </button>
                                         <button
                                             onClick={(e) => handleDeleteView(e, view.id)}
                                             className={`opacity-0 group-hover:opacity-100 p-1 transition-colors ${isActive ? 'text-brand-400 hover:text-red-500' : 'text-slate-400 hover:text-red-500'}`}
-                                            title="Delete View"
+                                            title="Delete Filter"
                                         >
                                             <Trash2 className="w-3 h-3 pointer-events-none" />
                                         </button>
@@ -570,14 +567,13 @@ export const Sidebar: React.FC = () => {
 
                     <button
                         onClick={handleAddView}
-                        className={`w-full flex items-center min-h-[44px] rounded-xl text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors mt-2 p-0 overflow-hidden`}
+                        className={`w-full flex items-center min-h-[44px] rounded-xl text-sm text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white dark:hover:bg-slate-800 border border-dashed border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 transition-all duration-200 mt-2 p-0 overflow-hidden`}
+                        title="New Filter"
                     >
-                        <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
-                            <Plus className="w-3.5 h-3.5" />
+                        <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
+                            <PlusCircle className="w-5 h-5" />
                         </div>
-                        <div className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>
-                            Add View
-                        </div>
+                        <span className={`whitespace-nowrap overflow-hidden transition-all duration-500 font-medium ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>New Filter</span>
                     </button>
                 </div>
             </div>
@@ -593,10 +589,10 @@ export const Sidebar: React.FC = () => {
             min-h-[44px]`}
                     title="Settings"
                 >
-                    <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12 h-11' : 'w-full h-11'}`}>
+                    <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12 h-11' : 'w-full h-11'}`}>
                         <Settings className="w-5 h-5" />
                     </div>
-                    <div className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>
+                    <div className={`whitespace-nowrap overflow-hidden transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'}`}>
                         Settings
                     </div>
                 </button>

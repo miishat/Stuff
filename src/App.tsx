@@ -112,7 +112,9 @@ const GlobalModal: React.FC = () => {
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={closeModal}></div>
             <div className="relative bg-white dark:bg-dark-surface rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-100 border border-slate-200 dark:border-slate-800">
                 <div className="p-6">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">{activeModal.title}</h3>
+                    {activeModal.type !== 'options' && (
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">{activeModal.title}</h3>
+                    )}
                     {activeModal.message && <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">{activeModal.message}</p>}
 
                     {activeModal.type === 'prompt' ? (
@@ -133,7 +135,8 @@ const GlobalModal: React.FC = () => {
                         </form>
                     ) : activeModal.type === 'options' ? (
                         <div>
-                            <div className="flex justify-end items-center mb-3">
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{activeModal.title}</h3>
                                 <button
                                     onClick={handleShuffle}
                                     className="flex items-center gap-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors px-2 py-1 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg"

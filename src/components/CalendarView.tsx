@@ -11,8 +11,7 @@ interface CalendarViewProps {
 
 type CalendarScope = 'project' | 'workspace' | 'all';
 
-// Draggable Task Component
-const DraggableTask = ({ task, onClick }: { task: Task; onClick: (task: Task) => void }) => {
+const DraggableTask = ({ task, onClick, isDone }: { task: Task; onClick: (task: Task) => void; isDone?: boolean }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: task.id,
         data: { task }
@@ -35,7 +34,10 @@ const DraggableTask = ({ task, onClick }: { task: Task; onClick: (task: Task) =>
                     onClick(task);
                 }
             }}
-            className="px-2 py-1.5 bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 rounded-md text-[11px] font-medium text-brand-700 dark:text-brand-300 truncate hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors touch-none"
+            className={`px-2 py-1.5 border rounded-md text-[11px] font-medium truncate transition-colors touch-none ${isDone
+                    ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-500 opacity-75'
+                    : 'bg-brand-50 dark:bg-brand-900/20 border-brand-100 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/40'
+                }`}
             title={task.title}
         >
             {task.title}
@@ -62,11 +64,13 @@ const DroppableDay = ({ day, children, dateStr }: { day: number | null; children
 };
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
-    const { tasks: allTasks, activeProjectId, activeWorkspaceId, projects, activeProject, priorityFilter, updateTask } = useStore();
+    const { tasks: allTasks, activeProjectId, activeWorkspaceId, projects, activeProject, priorityFilter, updateTask, columns } = useStore();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [scope, setScope] = useState<CalendarScope>('project');
     const [isScopeMenuOpen, setIsScopeMenuOpen] = useState(false);
     const [activeDragTask, setActiveDragTask] = useState<Task | null>(null);
+
+    const doneColumn = useMemo(() => columns.find(c => c.title === 'Done'), [columns]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -243,7 +247,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                             </div>
                                             <div className="space-y-1.5">
                                                 {visibleTasks.map(task => (
-                                                    <DraggableTask key={task.id} task={task} onClick={onTaskClick} />
+                                                    <DraggableTask
+                                                        key={task.id}
+                                                        task={task}
+                                                        onClick={onTaskClick}
+                                                        isDone={doneColumn && task.columnId === doneColumn.id}
+                                                    />
                                                 ))}
                                                 {overflowCount > 0 && (
                                                     <button
@@ -294,8 +303,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                         className="px-3 py-2 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 cursor-pointer hover:border-brand-500 dark:hover:border-brand-500 hover:shadow-sm transition-all flex items-center gap-2"
                                     >
                                         <div className={`w-2 h-2 rounded-full ${task.priority === 'High' ? 'bg-red-500' :
-                                                task.priority === 'Medium' ? 'bg-amber-500' :
-                                                    'bg-emerald-500'
+                                            task.priority === 'Medium' ? 'bg-amber-500' :
+                                                'bg-emerald-500'
                                             }`} />
                                         <span className="truncate">{task.title}</span>
                                     </div>
