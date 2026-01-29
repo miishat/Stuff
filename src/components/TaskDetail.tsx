@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Priority } from '../types';
-import { X, Calendar, Flag, AlignLeft, Link as LinkIcon, ExternalLink, Tag, Plus, Trash2 } from 'lucide-react';
+import { X, Calendar, Flag, AlignLeft, Link as LinkIcon, ExternalLink, Tag, Plus, Trash2, CheckSquare, Check } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { CustomDatePicker } from './CustomDatePicker';
 
@@ -10,11 +10,12 @@ interface TaskDetailProps {
 }
 
 export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
-    const { tasks, updateTask, deleteTask, projects, openModal } = useStore();
+    const { tasks, updateTask, deleteTask, projects, openModal, addSubtask, toggleSubtask, deleteSubtask } = useStore();
     const task = tasks.find(t => t.id === taskId);
     const project = projects.find(p => p.id === task?.projectId);
     const [labelInput, setLabelInput] = useState('');
     const [showLabelSuggestions, setShowLabelSuggestions] = useState(false);
+    const [subtaskInput, setSubtaskInput] = useState('');
     const labelInputRef = useRef<HTMLInputElement>(null);
 
     // Close on Escape
@@ -298,6 +299,71 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
                             className="w-full h-full min-h-[200px] resize-none border-none focus:ring-0 text-slate-600 dark:text-slate-300 leading-relaxed bg-transparent p-0 text-sm"
                             placeholder="Add a more detailed description..."
                         />
+                    </div>
+
+                    {/* Subtasks Section */}
+                    <div className="mt-8">
+                        <div className="flex items-center gap-2 mb-4 text-sm font-semibold text-slate-900 dark:text-white">
+                            <CheckSquare className="w-4 h-4" /> Subtasks
+                        </div>
+
+                        {/* Subtask List */}
+                        <div className="space-y-2 mb-4">
+                            {(task.subtasks || []).map(subtask => (
+                                <div
+                                    key={subtask.id}
+                                    className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/30 rounded-lg border border-slate-100 dark:border-slate-800/50 group"
+                                >
+                                    <button
+                                        onClick={() => toggleSubtask(taskId!, subtask.id)}
+                                        className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${subtask.completed
+                                            ? 'bg-emerald-500 border-emerald-500 text-white'
+                                            : 'border-slate-300 dark:border-slate-600 hover:border-brand-500 dark:hover:border-brand-400'
+                                            }`}
+                                    >
+                                        {subtask.completed && <Check className="w-3 h-3" />}
+                                    </button>
+                                    <span className={`flex-1 text-sm ${subtask.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300'}`}>
+                                        {subtask.title}
+                                    </span>
+                                    <button
+                                        onClick={() => deleteSubtask(taskId!, subtask.id)}
+                                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded text-slate-400 hover:text-red-500 transition-all"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Add New Subtask */}
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={subtaskInput}
+                                onChange={(e) => setSubtaskInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && subtaskInput.trim()) {
+                                        addSubtask(taskId!, subtaskInput.trim());
+                                        setSubtaskInput('');
+                                    }
+                                }}
+                                placeholder="Add a subtask..."
+                                className="flex-1 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                            />
+                            <button
+                                onClick={() => {
+                                    if (subtaskInput.trim()) {
+                                        addSubtask(taskId!, subtaskInput.trim());
+                                        setSubtaskInput('');
+                                    }
+                                }}
+                                disabled={!subtaskInput.trim()}
+                                className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 text-slate-500 dark:text-slate-400 rounded-lg transition-all disabled:opacity-50"
+                            >
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

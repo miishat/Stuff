@@ -62,6 +62,9 @@ interface StoreContextType {
     updateTask: (taskId: string, updates: Partial<Task>) => void;
     moveTask: (taskId: string, newColumnId: ColumnId) => void;
     deleteTask: (taskId: string) => void;
+    addSubtask: (taskId: string, title: string) => void;
+    toggleSubtask: (taskId: string, subtaskId: string) => void;
+    deleteSubtask: (taskId: string, subtaskId: string) => void;
 
     addColumn: () => void;
     updateColumn: (id: string, title: string) => void;
@@ -477,6 +480,39 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setTasks(prev => prev.filter(t => t.id !== taskId));
     }, []);
 
+    const addSubtask = useCallback((taskId: string, title: string) => {
+        setTasks(prev => prev.map(t => {
+            if (t.id === taskId) {
+                const newSubtask = { id: `st-${Date.now()}`, title, completed: false };
+                return { ...t, subtasks: [...(t.subtasks || []), newSubtask] };
+            }
+            return t;
+        }));
+    }, []);
+
+    const toggleSubtask = useCallback((taskId: string, subtaskId: string) => {
+        setTasks(prev => prev.map(t => {
+            if (t.id === taskId && t.subtasks) {
+                return {
+                    ...t,
+                    subtasks: t.subtasks.map(st =>
+                        st.id === subtaskId ? { ...st, completed: !st.completed } : st
+                    )
+                };
+            }
+            return t;
+        }));
+    }, []);
+
+    const deleteSubtask = useCallback((taskId: string, subtaskId: string) => {
+        setTasks(prev => prev.map(t => {
+            if (t.id === taskId && t.subtasks) {
+                return { ...t, subtasks: t.subtasks.filter(st => st.id !== subtaskId) };
+            }
+            return t;
+        }));
+    }, []);
+
     const addColumn = useCallback(() => {
         // Determine which project this column belongs to.
         const targetProjectId = activeProjectId || filteredProjects[0]?.id;
@@ -578,6 +614,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateTask,
         moveTask,
         deleteTask,
+        addSubtask,
+        toggleSubtask,
+        deleteSubtask,
         addColumn,
         updateColumn,
         deleteColumn,
@@ -617,6 +656,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateTask,
         moveTask,
         deleteTask,
+        addSubtask,
+        toggleSubtask,
+        deleteSubtask,
         addColumn,
         updateColumn,
         deleteColumn,

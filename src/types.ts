@@ -7,6 +7,12 @@ export interface Workspace {
     name: string;
 }
 
+export interface Subtask {
+    id: string;
+    title: string;
+    completed: boolean;
+}
+
 export interface Task {
     id: string;
     title: string;
@@ -18,6 +24,7 @@ export interface Task {
     dueDate?: string;
     labels: string[];
     ticketLink?: string;
+    subtasks?: Subtask[];
 }
 
 export interface Project {
