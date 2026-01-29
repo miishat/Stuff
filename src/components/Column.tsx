@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ColumnConfig, Task } from '../types';
 import { TaskCard } from './TaskCard';
-import { Plus, MoreHorizontal, Trash } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import { useStore } from '../context/Store';
 
 interface ColumnProps {

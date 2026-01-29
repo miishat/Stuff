@@ -336,7 +336,7 @@ export const Board: React.FC = () => {
             ) : (
                 <div className="flex-1 overflow-hidden p-6 pt-0">
                     <div className="h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
-                        <CalendarView tasks={filteredTasks} onTaskClick={(t) => setDetailTaskId(t.id)} />
+                        <CalendarView onTaskClick={(t) => setDetailTaskId(t.id)} />
                     </div>
                 </div>
             )}

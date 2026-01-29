@@ -4,13 +4,12 @@ import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useStore } from '../context/Store';
 
 interface CalendarViewProps {
-    tasks: Task[]; // These are already filtered by the parent Board, but we might want broader scope here
     onTaskClick: (task: Task) => void;
 }
 
 type CalendarScope = 'project' | 'workspace' | 'all';
 
-export const CalendarView: React.FC<CalendarViewProps> = ({ tasks: initialTasks, onTaskClick }) => {
+export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
     const { tasks: allTasks, activeProjectId, activeWorkspaceId, projects, activeProject } = useStore();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [scope, setScope] = useState<CalendarScope>('project');
@@ -126,10 +125,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ tasks: initialTasks,
                                 {day && (
                                     <>
                                         <div className={`text-xs font-bold mb-2 ${day === new Date().getDate() &&
-                                                currentDate.getMonth() === new Date().getMonth() &&
-                                                currentDate.getFullYear() === new Date().getFullYear()
-                                                ? 'text-white bg-brand-500 w-7 h-7 rounded-lg flex items-center justify-center shadow-lg shadow-brand-500/30'
-                                                : 'text-slate-400 dark:text-slate-500'
+                                            currentDate.getMonth() === new Date().getMonth() &&
+                                            currentDate.getFullYear() === new Date().getFullYear()
+                                            ? 'text-white bg-brand-500 w-7 h-7 rounded-lg flex items-center justify-center shadow-lg shadow-brand-500/30'
+                                            : 'text-slate-400 dark:text-slate-500'
                                             }`}>
                                             {day}
                                         </div>
