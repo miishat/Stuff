@@ -133,8 +133,7 @@ const GlobalModal: React.FC = () => {
                         </form>
                     ) : activeModal.type === 'options' ? (
                         <div>
-                            <div className="flex justify-between items-center mb-3">
-                                <span className="text-xs font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider">Select Icon</span>
+                            <div className="flex justify-end items-center mb-3">
                                 <button
                                     onClick={handleShuffle}
                                     className="flex items-center gap-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors px-2 py-1 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg"
