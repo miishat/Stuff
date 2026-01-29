@@ -117,7 +117,11 @@ export const Board: React.FC = () => {
                     initialPriority = p;
                 }
             } else if (activeCustomView.filterType === 'label') {
-                initialLabels.push(activeCustomView.filterValue);
+                if (Array.isArray(activeCustomView.filterValue)) {
+                    initialLabels.push(...activeCustomView.filterValue);
+                } else {
+                    initialLabels.push(activeCustomView.filterValue);
+                }
             }
         }
 

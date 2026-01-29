@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
-import { Project, Task, ColumnId, ColumnConfig, CustomView, Workspace } from '../types';
+import { Project, Task, ColumnId, ColumnConfig, CustomView, Workspace, Label } from '../types';
 
 export type ViewType = 'board' | 'calendar';
 export type ViewFilter = 'project' | 'recent' | string; // 'project', 'recent', or custom view ID
@@ -22,6 +22,7 @@ interface StoreContextType {
     tasks: Task[];
     columns: ColumnConfig[];
     customViews: CustomView[];
+    labels: Label[];
     activeProjectId: string;
     searchQuery: string;
     isSidebarOpen: boolean;
@@ -29,6 +30,7 @@ interface StoreContextType {
     viewFilter: ViewFilter;
     priorityFilter: string | null;
     isSettingsOpen: boolean;
+    isManageLabelsOpen: boolean;
     theme: Theme;
     activeModal: ModalConfig | null;
     recentViewGlobal: boolean;
@@ -46,6 +48,7 @@ interface StoreContextType {
     setViewFilter: (filter: ViewFilter) => void;
     setPriorityFilter: (priority: string | null) => void;
     setSettingsOpen: (isOpen: boolean) => void;
+    setManageLabelsOpen: (isOpen: boolean) => void;
     toggleTheme: (theme: Theme) => void;
     toggleRecentViewGlobal: () => void;
 
@@ -70,9 +73,13 @@ interface StoreContextType {
     updateColumn: (id: string, title: string) => void;
     deleteColumn: (id: string) => void;
 
-    addCustomView: (name: string, filterType: 'priority' | 'label', filterValue: string, allWorkspaces?: boolean) => void;
+    addCustomView: (name: string, filterType: 'priority' | 'label', filterValue: string | string[], allWorkspaces?: boolean) => void;
     updateCustomView: (id: string, updates: Partial<CustomView>) => void;
     deleteCustomView: (id: string) => void;
+
+    addLabel: (name: string, color: string) => void;
+    updateLabel: (id: string, updates: Partial<Label>) => void;
+    deleteLabel: (id: string) => void;
 
     activeProject: Project | undefined;
     filteredTasks: Task[];
@@ -93,6 +100,7 @@ const STORAGE_KEYS = {
     theme: 'stuff_theme',
     activeWorkspaceId: 'stuff_activeWorkspaceId',
     activeProjectId: 'stuff_activeProjectId',
+    labels: 'stuff_labels',
 };
 
 // Helper functions for localStorage
@@ -208,6 +216,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [customViews, setCustomViews] = useState<CustomView[]>(() =>
         loadFromStorage(STORAGE_KEYS.customViews, [])
     );
+    const [labels, setLabels] = useState<Label[]>(() =>
+        loadFromStorage(STORAGE_KEYS.labels, [])
+    );
 
     const [activeProjectId, setActiveProjectId] = useState<string>(() =>
         loadFromStorage(STORAGE_KEYS.activeProjectId, 'p1')
@@ -218,6 +229,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [viewFilter, setViewFilter] = useState<ViewFilter>('project');
     const [priorityFilter, setPriorityFilter] = useState<string | null>(null);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
+    const [isManageLabelsOpen, setManageLabelsOpen] = useState(false);
     const [theme, setTheme] = useState<Theme>(() =>
         loadFromStorage(STORAGE_KEYS.theme, 'light')
     );
@@ -246,6 +258,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     useEffect(() => {
         saveToStorage(STORAGE_KEYS.customViews, customViews);
     }, [customViews]);
+
+    useEffect(() => {
+        saveToStorage(STORAGE_KEYS.labels, labels);
+    }, [labels]);
 
     useEffect(() => {
         saveToStorage(STORAGE_KEYS.theme, theme);
@@ -320,8 +336,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     if (activeCustomView.filterType === 'priority') {
                         matchesView = t.priority === activeCustomView.filterValue;
                     } else if (activeCustomView.filterType === 'label') {
-                        // Case insensitive check
-                        matchesView = t.labels.some(l => l.toLowerCase() === activeCustomView.filterValue.toLowerCase());
+                        // Handle both single string and array of labels
+                        const filterLabels = Array.isArray(activeCustomView.filterValue)
+                            ? activeCustomView.filterValue
+                            : [activeCustomView.filterValue];
+                        // Task matches if it has ANY of the filter labels (case insensitive)
+                        matchesView = t.labels.some(taskLabel =>
+                            filterLabels.some(filterLabel =>
+                                taskLabel.toLowerCase() === filterLabel.toLowerCase()
+                            )
+                        );
                     }
                 }
             }
@@ -536,7 +560,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setTasks(prev => prev.filter(t => t.columnId !== id));
     }, []);
 
-    const addCustomView = useCallback((name: string, filterType: 'priority' | 'label', filterValue: string, allWorkspaces: boolean = false) => {
+    const addCustomView = useCallback((name: string, filterType: 'priority' | 'label', filterValue: string | string[], allWorkspaces: boolean = false) => {
         const newView: CustomView = {
             id: `view-${Date.now()}`,
             name,
@@ -570,6 +594,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         });
     }, []);
 
+    const addLabel = useCallback((name: string, color: string) => {
+        const newLabel: Label = { id: `lbl-${Date.now()}`, name, color };
+        setLabels(prev => [...prev, newLabel]);
+    }, []);
+
+    const updateLabel = useCallback((id: string, updates: Partial<Label>) => {
+        setLabels(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l));
+    }, []);
+
+    const deleteLabel = useCallback((id: string) => {
+        setLabels(prev => prev.filter(l => l.id !== id));
+    }, []);
+
     // Wrap function in a closure to avoid state update issues if the config is a function
     const openModal = useCallback((config: ModalConfig) => setActiveModal(() => config), []);
     const closeModal = useCallback(() => setActiveModal(null), []);
@@ -588,6 +625,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         viewFilter,
         priorityFilter,
         isSettingsOpen,
+        isManageLabelsOpen,
         theme,
         activeModal,
         activeWorkspace,
@@ -604,6 +642,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setViewFilter,
         setPriorityFilter,
         setSettingsOpen,
+        setManageLabelsOpen,
         toggleTheme,
         openModal,
         closeModal,
@@ -626,7 +665,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         activeProject,
         filteredTasks,
         recentViewGlobal,
-        toggleRecentViewGlobal
+        toggleRecentViewGlobal,
+        labels,
+        addLabel,
+        updateLabel,
+        deleteLabel
     }), [
         workspaces,
         activeWorkspaceId,
@@ -672,7 +715,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         activeProject,
         filteredTasks,
         recentViewGlobal,
-        toggleRecentViewGlobal
+        toggleRecentViewGlobal,
+        labels,
+        addLabel,
+        updateLabel,
+        deleteLabel,
+        isManageLabelsOpen,
+        setManageLabelsOpen
     ]);
 
     return (

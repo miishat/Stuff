@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { Task } from '../types';
-import { Calendar, Flag, Tag as TagIcon, CheckSquare, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Calendar, Flag, CheckSquare, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { useStore } from '../context/Store';
 
 interface TaskCardProps {
@@ -11,7 +11,7 @@ interface TaskCardProps {
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const { toggleSubtask } = useStore();
+    const { toggleSubtask, labels } = useStore();
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: task.id,
@@ -99,15 +99,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
             {/* Labels */}
             {task.labels.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-3">
-                    {task.labels.map((label, index) => (
-                        <span
-                            key={index}
-                            className="inline-flex items-center px-2 py-0.5 rounded-md bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 text-[10px] font-medium border border-brand-100 dark:border-brand-800"
-                        >
-                            <TagIcon className="w-2.5 h-2.5 mr-1" />
-                            {label}
-                        </span>
-                    ))}
+                    {task.labels.map((labelName, index) => {
+                        const labelDef = labels.find(l => l.name.toLowerCase() === labelName.toLowerCase());
+                        const colorClass = labelDef?.color || 'bg-slate-500';
+                        return (
+                            <span
+                                key={index}
+                                className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium text-white ${colorClass}`}
+                            >
+                                {labelName}
+                            </span>
+                        );
+                    })}
                 </div>
             )}
 

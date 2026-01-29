@@ -10,7 +10,7 @@ interface TaskDetailProps {
 }
 
 export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
-    const { tasks, updateTask, deleteTask, projects, openModal, addSubtask, toggleSubtask, deleteSubtask } = useStore();
+    const { tasks, updateTask, deleteTask, projects, openModal, addSubtask, toggleSubtask, deleteSubtask, labels: storeLabels, addLabel: addLabelToStore } = useStore();
     const task = tasks.find(t => t.id === taskId);
     const project = projects.find(p => p.id === task?.projectId);
     const [labelInput, setLabelInput] = useState('');
@@ -40,8 +40,9 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
 
     if (!task || !taskId) return null;
 
-    // Calculate existing unique labels for suggestions
-    const allLabels = Array.from(new Set(tasks.flatMap(t => t.labels))).sort();
+    // Use defined labels from store for suggestions, fallback to task labels
+    const allDefinedLabels = storeLabels.map(l => l.name);
+    const allLabels = Array.from(new Set([...allDefinedLabels, ...tasks.flatMap(t => t.labels)])).sort();
     const filteredSuggestions = allLabels.filter(l =>
         l.toLowerCase().includes(labelInput.toLowerCase()) &&
         !task.labels.includes(l)
@@ -55,6 +56,11 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
         const trimmed = labelName.trim();
         if (trimmed && !task.labels.some(l => l.toLowerCase() === trimmed.toLowerCase())) {
             updateTask(taskId, { labels: [...task.labels, trimmed] });
+            // Auto-add to store labels if not already defined
+            const existsInStore = storeLabels.some(l => l.name.toLowerCase() === trimmed.toLowerCase());
+            if (!existsInStore) {
+                addLabelToStore(trimmed, 'bg-slate-500'); // Default color
+            }
         }
         setLabelInput('');
         setShowLabelSuggestions(false);
@@ -236,14 +242,18 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
                             </div>
                             <div className="flex-1 flex flex-col gap-2">
                                 <div className="flex flex-wrap gap-2">
-                                    {task.labels.map(label => (
-                                        <span key={label} className="inline-flex items-center px-2 py-1 rounded bg-brand-50 dark:bg-brand-900/30 text-xs font-medium text-brand-700 dark:text-brand-300 border border-brand-100 dark:border-brand-800">
-                                            {label}
-                                            <button onClick={() => handleRemoveLabel(label)} className="ml-1.5 hover:text-brand-900 dark:hover:text-white">
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </span>
-                                    ))}
+                                    {task.labels.map(labelName => {
+                                        const labelDef = storeLabels.find(l => l.name.toLowerCase() === labelName.toLowerCase());
+                                        const colorClass = labelDef?.color || 'bg-slate-500';
+                                        return (
+                                            <span key={labelName} className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white ${colorClass}`}>
+                                                {labelName}
+                                                <button onClick={() => handleRemoveLabel(labelName)} className="ml-1.5 hover:text-slate-200">
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
                                 </div>
                                 <div className="flex items-center gap-2 relative">
                                     <div className="relative flex-1" ref={labelInputRef}>
@@ -262,16 +272,20 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
                                         {/* Label Suggestions Dropdown */}
                                         {showLabelSuggestions && filteredSuggestions.length > 0 && (
                                             <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl z-20 max-h-40 overflow-y-auto">
-                                                {filteredSuggestions.map(suggestion => (
-                                                    <div
-                                                        key={suggestion}
-                                                        onClick={() => addLabel(suggestion)}
-                                                        className="px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer flex items-center"
-                                                    >
-                                                        <Tag className="w-3 h-3 mr-2 text-slate-400" />
-                                                        {suggestion}
-                                                    </div>
-                                                ))}
+                                                {filteredSuggestions.map(suggestion => {
+                                                    const labelDef = storeLabels.find(l => l.name.toLowerCase() === suggestion.toLowerCase());
+                                                    const colorClass = labelDef?.color || 'bg-slate-400';
+                                                    return (
+                                                        <div
+                                                            key={suggestion}
+                                                            onClick={() => addLabel(suggestion)}
+                                                            className="px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer flex items-center"
+                                                        >
+                                                            <span className={`w-3 h-3 rounded-full mr-2 ${colorClass}`} />
+                                                            {suggestion}
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         )}
                                     </div>

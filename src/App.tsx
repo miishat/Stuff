@@ -3,7 +3,8 @@ import { StoreProvider, useStore } from './context/Store';
 import { Sidebar } from './components/Sidebar';
 import { Board } from './components/Board';
 import { CommandPalette } from './components/CommandPalette';
-import { X, Moon, Sun, RefreshCw } from 'lucide-react';
+import { ManageLabelsModal } from './components/ManageLabelsModal';
+import { X, Moon, Sun, RefreshCw, Tags } from 'lucide-react';
 
 
 // Helper for unbiased shuffling (Fisher-Yates)
@@ -17,7 +18,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 const SettingsModal: React.FC = () => {
-    const { isSettingsOpen, setSettingsOpen, theme, toggleTheme } = useStore();
+    const { isSettingsOpen, setSettingsOpen, theme, toggleTheme, setManageLabelsOpen } = useStore();
 
     if (!isSettingsOpen) return null;
 
@@ -52,6 +53,21 @@ const SettingsModal: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Manage Labels */}
+                    <div>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Labels</h3>
+                        <button
+                            onClick={() => {
+                                setSettingsOpen(false);
+                                setManageLabelsOpen(true);
+                            }}
+                            className="w-full flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all text-slate-700 dark:text-slate-300"
+                        >
+                            <Tags className="w-5 h-5" />
+                            <span className="text-sm font-medium">Manage Labels</span>
+                        </button>
+                    </div>
+
                     <div className="pt-4 text-center text-xs text-slate-400 dark:text-slate-600 font-mono">
                         <div>Stuff v1.0.0</div>
                         <div className="mt-1">Made by <a href="https://github.com/miishat" target="_blank" rel="noopener noreferrer" className="hover:text-brand-500 transition-colors">@Mishat</a></div>
@@ -60,6 +76,12 @@ const SettingsModal: React.FC = () => {
             </div>
         </div>
     );
+}
+
+const GlobalLabelsModal: React.FC = () => {
+    const { isManageLabelsOpen, setManageLabelsOpen } = useStore();
+    if (!isManageLabelsOpen) return null;
+    return <ManageLabelsModal onClose={() => setManageLabelsOpen(false)} />;
 }
 
 const GlobalModal: React.FC = () => {
@@ -186,6 +208,7 @@ function App() {
                 <CommandPalette />
                 <GlobalModal />
                 <SettingsModal />
+                <GlobalLabelsModal />
                 <Sidebar />
                 <div className="flex-1 overflow-hidden relative">
                     <Board />

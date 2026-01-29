@@ -13,6 +13,12 @@ export interface Subtask {
     completed: boolean;
 }
 
+export interface Label {
+    id: string;
+    name: string;
+    color: string; // Tailwind color class or hex
+}
+
 export interface Task {
     id: string;
     title: string;
@@ -47,6 +53,6 @@ export interface CustomView {
     name: string;
     icon: any; // Lucide icon name or component
     filterType: 'priority' | 'label';
-    filterValue: string;
+    filterValue: string | string[]; // Single value or array for multi-select
     allWorkspaces?: boolean;
 }
