@@ -28,6 +28,20 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
         }
     }, [scope, allTasks, activeProjectId, activeWorkspaceId, projects]);
 
+    // Optimize task lookup by date to avoid O(N*M) complexity in the render loop
+    const tasksByDate = useMemo(() => {
+        const map = new Map<string, Task[]>();
+        displayTasks.forEach(task => {
+            if (task.dueDate) {
+                if (!map.has(task.dueDate)) {
+                    map.set(task.dueDate, []);
+                }
+                map.get(task.dueDate)!.push(task);
+            }
+        });
+        return map;
+    }, [displayTasks]);
+
     const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
 
@@ -54,7 +68,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
         const dayStr = String(day).padStart(2, '0');
         const dateStr = `${year}-${month}-${dayStr}`;
-        return displayTasks.filter(t => t.dueDate === dateStr);
+        return tasksByDate.get(dateStr) || [];
     };
 
     return (
