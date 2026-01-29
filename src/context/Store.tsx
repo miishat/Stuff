@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import { Project, Task, ColumnId, ColumnConfig, CustomView, Workspace } from '../types';
 
 export type ViewType = 'board' | 'calendar';
@@ -365,7 +365,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     // --- Actions ---
 
-    const addWorkspace = (name: string) => {
+    const addWorkspace = useCallback((name: string) => {
         const newWorkspaceId = `w${Date.now()}`;
         const newWorkspace: Workspace = { id: newWorkspaceId, name };
 
@@ -387,17 +387,18 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         setActiveWorkspaceId(newWorkspace.id);
         setActiveProjectId(defaultProject.id);
-    };
+    }, []);
 
-    const updateWorkspace = (id: string, name: string) => {
+    const updateWorkspace = useCallback((id: string, name: string) => {
         setWorkspaces(prev => prev.map(w => w.id === id ? { ...w, name } : w));
-    };
+    }, []);
 
-    const deleteWorkspace = (id: string) => {
+    const deleteWorkspace = useCallback((id: string) => {
         // 1. Remove Workspace
         setWorkspaces(prev => prev.filter(w => w.id !== id));
 
         // 2. Identify Projects in Workspace
+        // We need to use 'projects' from state here
         const projectsToDelete = projects.filter(p => p.workspaceId === id);
         const projectIdsToDelete = new Set(projectsToDelete.map(p => p.id));
 
@@ -421,9 +422,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setActiveWorkspaceId(newWs.id);
             }
         }
-    };
+    }, [projects, workspaces, activeWorkspaceId]);
 
-    const addProject = (name: string, icon: string) => {
+    const addProject = useCallback((name: string, icon: string) => {
         const newProjectId = `p${Date.now()}`;
         const newProject: Project = {
             id: newProjectId,
@@ -440,13 +441,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setColumns(prev => [...prev, ...newColumns]);
         setActiveProjectId(newProjectId);
         setViewFilter('project');
-    };
+    }, [activeWorkspaceId]);
 
-    const updateProject = (id: string, updates: { name?: string; icon?: string }) => {
+    const updateProject = useCallback((id: string, updates: { name?: string; icon?: string }) => {
         setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
-    };
+    }, []);
 
-    const deleteProject = (id: string) => {
+    const deleteProject = useCallback((id: string) => {
         setProjects(prev => prev.filter(p => p.id !== id));
         // Also delete tasks and columns associated with this project
         setTasks(prev => prev.filter(t => t.projectId !== id));
@@ -460,23 +461,23 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setViewFilter('recent'); // Fallback if no projects
             }
         }
-    };
+    }, [activeProjectId, filteredProjects]);
 
-    const addTask = (task: Task) => setTasks(prev => [...prev, task]);
+    const addTask = useCallback((task: Task) => setTasks(prev => [...prev, task]), []);
 
-    const updateTask = (taskId: string, updates: Partial<Task>) => {
+    const updateTask = useCallback((taskId: string, updates: Partial<Task>) => {
         setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
-    };
+    }, []);
 
-    const moveTask = (taskId: string, newColumnId: ColumnId) => {
+    const moveTask = useCallback((taskId: string, newColumnId: ColumnId) => {
         setTasks(prev => prev.map(t => t.id === taskId ? { ...t, columnId: newColumnId } : t));
-    };
+    }, []);
 
-    const deleteTask = (taskId: string) => {
+    const deleteTask = useCallback((taskId: string) => {
         setTasks(prev => prev.filter(t => t.id !== taskId));
-    };
+    }, []);
 
-    const addColumn = () => {
+    const addColumn = useCallback(() => {
         // Determine which project this column belongs to.
         const targetProjectId = activeProjectId || filteredProjects[0]?.id;
         if (!targetProjectId) return;
@@ -488,18 +489,18 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             color: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
         };
         setColumns(prev => [...prev, newCol]);
-    };
+    }, [activeProjectId, filteredProjects]);
 
-    const updateColumn = (id: string, title: string) => {
+    const updateColumn = useCallback((id: string, title: string) => {
         setColumns(prev => prev.map(c => c.id === id ? { ...c, title } : c));
-    };
+    }, []);
 
-    const deleteColumn = (id: string) => {
+    const deleteColumn = useCallback((id: string) => {
         setColumns(prev => prev.filter(c => c.id !== id));
         setTasks(prev => prev.filter(t => t.columnId !== id));
-    };
+    }, []);
 
-    const addCustomView = (name: string, filterType: 'priority' | 'label', filterValue: string, allWorkspaces: boolean = false) => {
+    const addCustomView = useCallback((name: string, filterType: 'priority' | 'label', filterValue: string, allWorkspaces: boolean = false) => {
         const newView: CustomView = {
             id: `view-${Date.now()}`,
             name,
@@ -510,85 +511,130 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         };
         setCustomViews(prev => [...prev, newView]);
         setViewFilter(newView.id);
-    };
+    }, []);
 
-    const updateCustomView = (id: string, updates: Partial<CustomView>) => {
+    const updateCustomView = useCallback((id: string, updates: Partial<CustomView>) => {
         setCustomViews(prev => prev.map(v => v.id === id ? { ...v, ...updates } : v));
-    };
+    }, []);
 
-    const deleteCustomView = (id: string) => {
+    const deleteCustomView = useCallback((id: string) => {
         setCustomViews(prev => prev.filter(v => v.id !== id));
         if (viewFilter === id) {
             setViewFilter('my_tasks');
         }
-    };
+    }, [viewFilter]);
 
-    const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
-    const toggleTheme = (newTheme: Theme) => setTheme(newTheme);
-    const toggleRecentViewGlobal = () => {
+    const toggleSidebar = useCallback(() => setIsSidebarOpen(prev => !prev), []);
+    const toggleTheme = useCallback((newTheme: Theme) => setTheme(newTheme), []);
+    const toggleRecentViewGlobal = useCallback(() => {
         setRecentViewGlobal(prev => {
             const newVal = !prev;
             saveToStorage('stuff_recentViewGlobal', newVal);
             return newVal;
         });
-    };
+    }, []);
 
     // Wrap function in a closure to avoid state update issues if the config is a function
-    const openModal = (config: ModalConfig) => setActiveModal(() => config);
-    const closeModal = () => setActiveModal(null);
+    const openModal = useCallback((config: ModalConfig) => setActiveModal(() => config), []);
+    const closeModal = useCallback(() => setActiveModal(null), []);
+
+    const contextValue = useMemo(() => ({
+        workspaces,
+        activeWorkspaceId,
+        projects,
+        tasks,
+        columns,
+        customViews,
+        activeProjectId,
+        searchQuery,
+        isSidebarOpen,
+        currentView,
+        viewFilter,
+        priorityFilter,
+        isSettingsOpen,
+        theme,
+        activeModal,
+        activeWorkspace,
+        filteredProjects,
+        filteredColumns,
+        setActiveWorkspaceId,
+        addWorkspace,
+        updateWorkspace,
+        deleteWorkspace,
+        setActiveProjectId,
+        setSearchQuery,
+        toggleSidebar,
+        setCurrentView,
+        setViewFilter,
+        setPriorityFilter,
+        setSettingsOpen,
+        toggleTheme,
+        openModal,
+        closeModal,
+        addProject,
+        updateProject,
+        deleteProject,
+        addTask,
+        updateTask,
+        moveTask,
+        deleteTask,
+        addColumn,
+        updateColumn,
+        deleteColumn,
+        addCustomView,
+        updateCustomView,
+        deleteCustomView,
+        activeProject,
+        filteredTasks,
+        recentViewGlobal,
+        toggleRecentViewGlobal
+    }), [
+        workspaces,
+        activeWorkspaceId,
+        projects,
+        tasks,
+        columns,
+        customViews,
+        activeProjectId,
+        searchQuery,
+        isSidebarOpen,
+        currentView,
+        viewFilter,
+        priorityFilter,
+        isSettingsOpen,
+        theme,
+        activeModal,
+        activeWorkspace,
+        filteredProjects,
+        filteredColumns,
+        addWorkspace,
+        updateWorkspace,
+        deleteWorkspace,
+        addProject,
+        updateProject,
+        deleteProject,
+        addTask,
+        updateTask,
+        moveTask,
+        deleteTask,
+        addColumn,
+        updateColumn,
+        deleteColumn,
+        addCustomView,
+        updateCustomView,
+        deleteCustomView,
+        toggleSidebar,
+        toggleTheme,
+        openModal,
+        closeModal,
+        activeProject,
+        filteredTasks,
+        recentViewGlobal,
+        toggleRecentViewGlobal
+    ]);
 
     return (
-        <StoreContext.Provider value={{
-            workspaces,
-            activeWorkspaceId,
-            projects,
-            tasks,
-            columns,
-            customViews,
-            activeProjectId,
-            searchQuery,
-            isSidebarOpen,
-            currentView,
-            viewFilter,
-            priorityFilter,
-            isSettingsOpen,
-            theme,
-            activeModal,
-            activeWorkspace,
-            filteredProjects,
-            filteredColumns,
-            setActiveWorkspaceId,
-            addWorkspace,
-            updateWorkspace,
-            deleteWorkspace,
-            setActiveProjectId,
-            setSearchQuery,
-            toggleSidebar,
-            setCurrentView,
-            setViewFilter,
-            setPriorityFilter,
-            setSettingsOpen,
-            toggleTheme,
-            openModal,
-            closeModal,
-            addProject,
-            updateProject,
-            deleteProject,
-            addTask,
-            updateTask,
-            moveTask,
-            deleteTask,
-            addColumn,
-            updateColumn,
-            deleteColumn,
-            addCustomView,
-            updateCustomView,
-            deleteCustomView,
-            activeProject,
-            filteredTasks,
-            recentViewGlobal,
-            toggleRecentViewGlobal
-        }}>
+        <StoreContext.Provider value={contextValue}>
             {children}
         </StoreContext.Provider>
     );
