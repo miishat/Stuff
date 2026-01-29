@@ -80,14 +80,29 @@ export const Sidebar: React.FC = () => {
     const handleChangeProjectIcon = (e: React.MouseEvent, project: Project) => {
         e.stopPropagation();
         openModal({
-            type: 'prompt',
-            title: 'Change Project Icon',
-            message: 'Enter an emoji for your project (e.g., 🚀, 📱, 🎨):',
+            type: 'options',
+            title: 'Select Project Icon',
             defaultValue: project.icon,
-            confirmLabel: 'Update Icon',
+            options: [
+                // Activity & Objects
+                '🚀', '🎨', '📱', '💻', '📊', '🔥', '🔮', '⚡', '💎', '🌈', '🏗️', '🤖', '🎮', '🎧', '📷', '📚', '💡', '🛠️', '🌍', '🏠',
+                '🎓', '🏆', '🎯', '🎪', '🎭', '🎬', '🎤', '🎹', '🎷', '🎸', '🎺', '🎻', '🎼', '🧩', '🎲', '🎰', '🎳', '🎱', '🏀', '🏈', '🎾',
+                // Nature
+                '🌲', '🌳', '🌴', '🌵', '🌷', '🌸', '🌹', '🌺', '🌻', '🌼', '🌽', '🌾', '🌿', '🍀', '🍁', '🍂', '🍃', '🍄', '🌰', '🦀', '🦞', '🦐', '🦑',
+                // Food
+                '🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️',
+                // Travel & Places
+                '🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🏍️', '🛵', '🚲', '🛴', '🛹', '🚏', '🛣️', '🛤️', '🛢️', '⛽',
+                // Symbols
+                '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️',
+                // Tech
+                '⌚', '📲', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️', '💽', '💾', '💿', '📀', '📼', '📸', '📹', '🎥', '📽️', '🎞️', '📞',
+                // Office
+                '📂', '📁', '📅', '📆', '📇', '📈', '📉', '📋', '📌', '📍', '📎', '📏', '📐', '✂️', '🗃️', '🗄️', '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑'
+            ],
             onConfirm: (newIcon) => {
                 if (newIcon) {
-                    updateProject(project.id, { icon: newIcon.trim() });
+                    updateProject(project.id, { icon: newIcon });
                 }
             }
         });
@@ -447,17 +462,22 @@ export const Sidebar: React.FC = () => {
                                 onClick={() => setViewFilter('recent')}
                                 className={`w-full flex items-center min-h-[44px] rounded-xl text-sm transition-all duration-200 group cursor-pointer overflow-hidden
                                 ${isActive
-                                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shadow-slate-200/50 dark:shadow-none font-semibold'
+                                        ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 shadow-sm'
                                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'} 
                                 p-0`}
                                 title="Recents"
                             >
+                                {/* Active Glow in Recents */}
+                                {isActive && (
+                                    <div className="absolute inset-0 rounded-xl ring-1 ring-brand-500/20 dark:ring-brand-400/20 pointer-events-none"></div>
+                                )}
+
                                 <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
                                     <Clock className="w-5 h-5" />
                                 </div>
 
                                 <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                                    <span className="flex-1">Recents</span>
+                                    <span className="flex-1 font-medium">Recents</span>
                                     <div className="pr-2">
                                         <button
                                             onClick={(e) => {
@@ -465,12 +485,12 @@ export const Sidebar: React.FC = () => {
                                                 toggleRecentViewGlobal();
                                             }}
                                             className={`p-1 rounded transition-colors ${recentViewGlobal
-                                                ? (isActive ? 'text-brand-300 hover:text-white' : 'text-brand-500 hover:text-brand-600')
-                                                : (isActive ? 'text-slate-400 hover:text-white' : 'text-slate-300 hover:text-slate-500')
+                                                ? (isActive ? 'text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-200' : 'text-brand-500 hover:text-brand-600')
+                                                : (isActive ? 'text-brand-400/50 hover:text-brand-600' : 'text-slate-300 hover:text-slate-500')
                                                 }`}
                                             title={recentViewGlobal ? "Showing all workspaces (click for current only)" : "Showing current workspace (click for all)"}
                                         >
-                                            <Globe className={`w-3.5 h-3.5 pointer-events-none ${recentViewGlobal ? '' : 'opacity-40'}`} />
+                                            <Globe className={`w-3.5 h-3.5 pointer-events-none ${recentViewGlobal ? '' : 'opacity-70'}`} />
                                         </button>
                                     </div>
                                 </div>
@@ -502,28 +522,32 @@ export const Sidebar: React.FC = () => {
                                 className={`
                             w-full flex items-center min-h-[44px] rounded-xl text-sm transition-all duration-200 group relative cursor-pointer overflow-hidden
                             ${isActive
-                                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shadow-slate-200/50 dark:shadow-none font-semibold'
+                                        ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 shadow-sm'
                                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'} 
                             p-0
                         `}
                                 title={view.name}
                             >
+                                {isActive && (
+                                    <div className="absolute inset-0 rounded-xl ring-1 ring-brand-500/20 dark:ring-brand-400/20 pointer-events-none"></div>
+                                )}
+
                                 <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-300 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
                                     <Icon className="w-4 h-4" />
                                 </div>
                                 <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                                    <span className="flex-1 truncate">{view.name}</span>
+                                    <span className="flex-1 truncate font-medium">{view.name}</span>
                                     <div className="flex items-center ml-auto gap-0.5 pr-2">
                                         <button
                                             onClick={(e) => handleEditView(e, view)}
-                                            className={`opacity-0 group-hover:opacity-100 p-1 transition-colors ${isActive ? 'text-slate-300 hover:text-white' : 'text-slate-400 hover:text-brand-600'}`}
+                                            className={`opacity-0 group-hover:opacity-100 p-1 transition-colors ${isActive ? 'text-brand-400 hover:text-brand-600' : 'text-slate-400 hover:text-brand-600'}`}
                                             title="Edit View"
                                         >
                                             <Pencil className="w-3 h-3 pointer-events-none" />
                                         </button>
                                         <button
                                             onClick={(e) => handleDeleteView(e, view.id)}
-                                            className={`opacity-0 group-hover:opacity-100 p-1 transition-colors ${isActive ? 'text-slate-300 hover:text-red-300' : 'text-slate-400 hover:text-red-500'}`}
+                                            className={`opacity-0 group-hover:opacity-100 p-1 transition-colors ${isActive ? 'text-brand-400 hover:text-red-500' : 'text-slate-400 hover:text-red-500'}`}
                                             title="Delete View"
                                         >
                                             <Trash2 className="w-3 h-3 pointer-events-none" />
@@ -531,12 +555,12 @@ export const Sidebar: React.FC = () => {
                                         <button
                                             onClick={handleToggleScope}
                                             className={`p-1 rounded transition-colors ${view.allWorkspaces
-                                                ? (isActive ? 'text-brand-300 hover:text-white' : 'text-brand-500 hover:text-brand-600')
-                                                : (isActive ? 'text-slate-400 hover:text-white' : 'text-slate-300 hover:text-slate-500')
+                                                ? (isActive ? 'text-brand-600 hover:text-brand-800' : 'text-brand-500 hover:text-brand-600')
+                                                : (isActive ? 'text-brand-300 hover:text-brand-500' : 'text-slate-300 hover:text-slate-500')
                                                 }`}
                                             title={view.allWorkspaces ? "Showing all workspaces (click to show current only)" : "Showing current workspace (click to show all)"}
                                         >
-                                            <Globe className={`w-3.5 h-3.5 pointer-events-none ${view.allWorkspaces ? '' : 'opacity-40'}`} />
+                                            <Globe className={`w-3.5 h-3.5 pointer-events-none ${view.allWorkspaces ? '' : 'opacity-70'}`} />
                                         </button>
                                     </div>
                                 </div>

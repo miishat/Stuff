@@ -10,23 +10,30 @@ interface CalendarViewProps {
 type CalendarScope = 'project' | 'workspace' | 'all';
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
-    const { tasks: allTasks, activeProjectId, activeWorkspaceId, projects, activeProject } = useStore();
+    const { tasks: allTasks, activeProjectId, activeWorkspaceId, projects, activeProject, priorityFilter } = useStore();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [scope, setScope] = useState<CalendarScope>('project');
     const [isScopeMenuOpen, setIsScopeMenuOpen] = useState(false);
 
-    // Compute tasks based on selected scope
+    // Compute tasks based on selected scope and priority filter
     const displayTasks = useMemo(() => {
-        if (scope === 'all') {
-            return allTasks;
-        } else if (scope === 'workspace') {
+        let tasks = allTasks;
+
+        // Apply Scope Filter
+        if (scope === 'workspace') {
             const workspaceProjectIds = new Set(projects.filter(p => p.workspaceId === activeWorkspaceId).map(p => p.id));
-            return allTasks.filter(t => workspaceProjectIds.has(t.projectId));
-        } else {
-            // Project scope
-            return allTasks.filter(t => t.projectId === activeProjectId);
+            tasks = tasks.filter(t => workspaceProjectIds.has(t.projectId));
+        } else if (scope === 'project') {
+            tasks = tasks.filter(t => t.projectId === activeProjectId);
         }
-    }, [scope, allTasks, activeProjectId, activeWorkspaceId, projects]);
+
+        // Apply Priority Filter
+        if (priorityFilter) {
+            tasks = tasks.filter(t => t.priority === priorityFilter);
+        }
+
+        return tasks;
+    }, [scope, allTasks, activeProjectId, activeWorkspaceId, projects, priorityFilter]);
 
     const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();

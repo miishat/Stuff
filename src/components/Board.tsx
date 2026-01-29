@@ -293,7 +293,7 @@ export const Board: React.FC = () => {
                     onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="flex-1 overflow-x-auto overflow-y-hidden">
+                    <div className="flex-1 overflow-x-auto overflow-y-hidden pt-2">
                         <div className="h-full flex px-6 pb-6 space-x-6 min-w-max">
                             {filteredColumns.map(col => {
                                 let columnTasks = [];

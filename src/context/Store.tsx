@@ -6,10 +6,11 @@ export type ViewFilter = 'project' | 'recent' | string; // 'project', 'recent', 
 export type Theme = 'light' | 'dark';
 
 interface ModalConfig {
-    type: 'confirm' | 'prompt';
+    type: 'confirm' | 'prompt' | 'options';
     title: string;
     message?: string;
     defaultValue?: string;
+    options?: string[]; // For 'options' type
     confirmLabel?: string;
     onConfirm: (value?: string) => void;
 }
