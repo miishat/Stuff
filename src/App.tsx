@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StoreProvider, useStore } from './context/Store';
 import { Sidebar } from './components/Sidebar';
 import { Board } from './components/Board';
+import { CommandPalette } from './components/CommandPalette';
 import { X, Moon, Sun, RefreshCw } from 'lucide-react';
 
 
@@ -177,25 +178,20 @@ const GlobalModal: React.FC = () => {
     );
 };
 
-const AppContent: React.FC = () => {
-    return (
-        <div className="flex h-screen w-screen bg-background dark:bg-dark-bg text-zinc-900 dark:text-zinc-100 font-sans overflow-hidden transition-colors duration-300">
-            <Sidebar />
-            <main className="flex-1 h-full overflow-hidden relative">
-                <Board />
-            </main>
-            <SettingsModal />
-            <GlobalModal />
-        </div>
-    );
-}
-
-const App: React.FC = () => {
+function App() {
     return (
         <StoreProvider>
-            <AppContent />
+            <div className="flex h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 font-sans selection:bg-brand-200 dark:selection:bg-brand-900 selection:text-brand-900 dark:selection:text-brand-100 overflow-hidden transition-colors duration-200">
+                <CommandPalette />
+                <GlobalModal />
+                <SettingsModal />
+                <Sidebar />
+                <div className="flex-1 overflow-hidden relative">
+                    <Board />
+                </div>
+            </div>
         </StoreProvider>
     );
-};
+}
 
 export default App;

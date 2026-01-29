@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../context/Store';
-import { CheckSquare, Settings, PlusCircle, Trash2, Clock, Flag, Tag, Plus, Pencil, ChevronDown, Check, FolderPlus, Edit2, Globe } from 'lucide-react';
+import { CheckSquare, Settings, PlusCircle, Trash2, Clock, Flag, Tag, Pencil, ChevronDown, Check, FolderPlus, Edit2, Globe } from 'lucide-react';
 import { CustomView, Project, Workspace } from '../types';
 
 export const Sidebar: React.FC = () => {

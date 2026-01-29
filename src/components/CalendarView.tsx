@@ -29,14 +29,14 @@ const DraggableTask = ({ task, onClick, isDone }: { task: Task; onClick: (task: 
             style={style}
             {...listeners}
             {...attributes}
-            onClick={(e) => {
+            onClick={() => {
                 if (!isDragging) {
                     onClick(task);
                 }
             }}
             className={`px-2 py-1.5 border rounded-md text-[11px] font-medium truncate transition-colors touch-none ${isDone
-                    ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-500 opacity-75'
-                    : 'bg-brand-50 dark:bg-brand-900/20 border-brand-100 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/40'
+                ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-500 opacity-75'
+                : 'bg-brand-50 dark:bg-brand-900/20 border-brand-100 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/40'
                 }`}
             title={task.title}
         >
