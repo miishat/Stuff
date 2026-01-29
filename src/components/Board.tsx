@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/Store';
 import { Column } from './Column';
-import { ColumnId, Priority } from '../types';
+import { ColumnId, Priority, Task } from '../types';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, useSensor, useSensors, PointerSensor, closestCorners } from '@dnd-kit/core';
 import { TaskCard } from './TaskCard';
 import { TaskDetail } from './TaskDetail';
@@ -151,6 +151,32 @@ export const Board: React.FC = () => {
 
     const activeTask = activeTaskId ? filteredTasks.find(t => t.id === activeTaskId) : null;
 
+    const tasksMap = useMemo(() => {
+        const byId: Record<string, Task[]> = {};
+        const byTitle: Record<string, Task[]> = {};
+
+        // Pre-compute map from columnId to columnTitle
+        const colIdToTitle: Record<string, string> = {};
+        columns.forEach(c => {
+            colIdToTitle[c.id] = c.title;
+        });
+
+        filteredTasks.forEach(t => {
+            // Group by ID
+            if (!byId[t.columnId]) byId[t.columnId] = [];
+            byId[t.columnId].push(t);
+
+            // Group by Title
+            const title = colIdToTitle[t.columnId];
+            if (title) {
+                if (!byTitle[title]) byTitle[title] = [];
+                byTitle[title].push(t);
+            }
+        });
+
+        return { byId, byTitle };
+    }, [filteredTasks, columns]);
+
     let viewTitle = 'Tasks';
     let viewIcon = '📋';
 
@@ -296,15 +322,12 @@ export const Board: React.FC = () => {
                     <div className="flex-1 overflow-x-auto overflow-y-hidden pt-2">
                         <div className="h-full flex px-6 pb-6 space-x-6 min-w-max">
                             {filteredColumns.map(col => {
-                                let columnTasks = [];
+                                let columnTasks: Task[] = [];
                                 if (col.id.startsWith('virtual-')) {
-                                    // Aggregate tasks by column title
-                                    columnTasks = filteredTasks.filter(t => {
-                                        const actualCol = columns.find(c => c.id === t.columnId);
-                                        return actualCol && actualCol.title === col.title;
-                                    });
+                                    const title = col.title;
+                                    columnTasks = tasksMap.byTitle[title] || [];
                                 } else {
-                                    columnTasks = filteredTasks.filter(t => t.columnId === col.id);
+                                    columnTasks = tasksMap.byId[col.id] || [];
                                 }
 
                                 return (
