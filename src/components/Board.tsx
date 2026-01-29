@@ -6,7 +6,8 @@ import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, useSensor, useSe
 import { TaskCard } from './TaskCard';
 import { TaskDetail } from './TaskDetail';
 import { CalendarView } from './CalendarView';
-import { Search, Filter, Kanban, Calendar as CalendarIcon, Plus, ChevronRight } from 'lucide-react';
+import { AnalyticsView } from './AnalyticsView';
+import { Search, Filter, Kanban, Calendar as CalendarIcon, Plus, ChevronRight, BarChart3 } from 'lucide-react';
 
 export const Board: React.FC = () => {
     const {
@@ -252,6 +253,13 @@ export const Board: React.FC = () => {
                             <CalendarIcon className="w-4 h-4 mr-2" />
                             Calendar
                         </button>
+                        <button
+                            onClick={() => setCurrentView('analytics')}
+                            className={`flex items-center px-4 py-2 text-xs font-bold rounded-lg transition-all ${currentView === 'analytics' ? 'bg-white dark:bg-slate-700 shadow-sm text-brand-600 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                        >
+                            <BarChart3 className="w-4 h-4 mr-2" />
+                            Analytics
+                        </button>
                     </div>
 
                     <div className="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden md:block"></div>
@@ -360,11 +368,15 @@ export const Board: React.FC = () => {
                         ) : null}
                     </DragOverlay>
                 </DndContext>
-            ) : (
+            ) : currentView === 'calendar' ? (
                 <div className="flex-1 overflow-hidden p-6 pt-0">
                     <div className="h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
                         <CalendarView onTaskClick={(t) => setDetailTaskId(t.id)} />
                     </div>
+                </div>
+            ) : (
+                <div className="flex-1 overflow-hidden">
+                    <AnalyticsView />
                 </div>
             )}
 

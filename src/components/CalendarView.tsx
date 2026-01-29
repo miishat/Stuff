@@ -180,7 +180,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                 className="flex items-center text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 transition-all"
                             >
                                 <span className="mr-2">
-                                    {scope === 'project' ? 'This Project' : scope === 'workspace' ? 'Entire Workspace' : 'All Workspaces'}
+                                    {scope === 'project' ? 'Current Project' : scope === 'workspace' ? 'Current Workspace' : 'All Workspaces'}
                                 </span>
                                 <ChevronDown className="w-3 h-3" />
                             </button>
@@ -190,10 +190,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                     <div className="fixed inset-0 z-10" onClick={() => setIsScopeMenuOpen(false)}></div>
                                     <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 py-1 z-20 overflow-hidden">
                                         <button onClick={() => { setScope('project'); setIsScopeMenuOpen(false); }} className={`w-full text-left px-4 py-2 text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 ${scope === 'project' ? 'text-brand-600 dark:text-brand-400' : 'text-slate-600 dark:text-slate-300'}`}>
-                                            This Project ({activeProject?.name})
+                                            Current Project ({activeProject?.name})
                                         </button>
                                         <button onClick={() => { setScope('workspace'); setIsScopeMenuOpen(false); }} className={`w-full text-left px-4 py-2 text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 ${scope === 'workspace' ? 'text-brand-600 dark:text-brand-400' : 'text-slate-600 dark:text-slate-300'}`}>
-                                            Entire Workspace
+                                            Current Workspace
                                         </button>
                                         <button onClick={() => { setScope('all'); setIsScopeMenuOpen(false); }} className={`w-full text-left px-4 py-2 text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 ${scope === 'all' ? 'text-brand-600 dark:text-brand-400' : 'text-slate-600 dark:text-slate-300'}`}>
                                             All Workspaces

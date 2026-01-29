@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import { Project, Task, ColumnId, ColumnConfig, CustomView, Workspace, Label } from '../types';
+import { exportData, importData, setupAutoBackup, performAutoBackup, verifyBackupPermission } from '../utils/backupUtils';
 
-export type ViewType = 'board' | 'calendar';
+export type ViewType = 'board' | 'calendar' | 'analytics';
 export type ViewFilter = 'project' | 'recent' | string; // 'project', 'recent', or custom view ID
 export type Theme = 'light' | 'dark';
 
@@ -86,6 +87,15 @@ interface StoreContextType {
     filteredProjects: Project[]; // Projects in current workspace
     activeWorkspace: Workspace | undefined;
     filteredColumns: ColumnConfig[];
+
+    // Backup
+    exportData: () => void;
+    importData: (file: File) => Promise<boolean>;
+    isAutoBackupEnabled: boolean;
+    autoBackupStatus: 'idle' | 'saving' | 'saved' | 'error' | 'permission-needed';
+    enableAutoBackup: () => Promise<boolean>;
+    disableAutoBackup: () => void;
+    reauthorizeAutoBackup: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -101,6 +111,7 @@ const STORAGE_KEYS = {
     activeWorkspaceId: 'stuff_activeWorkspaceId',
     activeProjectId: 'stuff_activeProjectId',
     labels: 'stuff_labels',
+    autoBackupEnabled: 'stuff_autoBackupEnabled',
 };
 
 // Helper functions for localStorage
@@ -237,6 +248,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [recentViewGlobal, setRecentViewGlobal] = useState<boolean>(() =>
         loadFromStorage('stuff_recentViewGlobal', false)
     );
+
+    // Auto-Backup State
+    const [isAutoBackupEnabled, setIsAutoBackupEnabled] = useState<boolean>(() =>
+        loadFromStorage(STORAGE_KEYS.autoBackupEnabled, false)
+    );
+    const [autoBackupStatus, setAutoBackupStatus] = useState<'idle' | 'saving' | 'saved' | 'error' | 'permission-needed'>('idle');
+    const backupTimeoutRef = React.useRef<any>(null);
 
     // Save data to localStorage whenever it changes
     useEffect(() => {
@@ -611,6 +629,84 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const openModal = useCallback((config: ModalConfig) => setActiveModal(() => config), []);
     const closeModal = useCallback(() => setActiveModal(null), []);
 
+    const handleImportData = useCallback(async (file: File) => {
+        const success = await importData(file);
+        if (success) {
+            window.location.reload();
+        }
+        return success;
+    }, []);
+
+    const enableAutoBackup = useCallback(async () => {
+        const success = await setupAutoBackup();
+        if (success) {
+            setIsAutoBackupEnabled(true);
+            saveToStorage(STORAGE_KEYS.autoBackupEnabled, true);
+            // Trigger an immediate backup
+            performAutoBackup().then(res => {
+                if (!res.success && res.error === 'permission-needed') {
+                    setAutoBackupStatus('permission-needed');
+                }
+            });
+        }
+        return success;
+    }, []);
+
+    const disableAutoBackup = useCallback(() => {
+        setIsAutoBackupEnabled(false);
+        saveToStorage(STORAGE_KEYS.autoBackupEnabled, false);
+        setAutoBackupStatus('idle');
+    }, []);
+
+    const reauthorizeAutoBackup = useCallback(async () => {
+        const granted = await verifyBackupPermission();
+        if (granted) {
+            setAutoBackupStatus('idle');
+            performAutoBackup().then(res => {
+                if (res.success) {
+                    setAutoBackupStatus('saved');
+                    setTimeout(() => setAutoBackupStatus('idle'), 2000);
+                } else {
+                    setAutoBackupStatus('error');
+                }
+            });
+        } else {
+            setAutoBackupStatus('permission-needed');
+        }
+    }, []);
+
+    // Auto-Backup Effect
+    useEffect(() => {
+        if (!isAutoBackupEnabled) return;
+
+        // Clear existing timeout
+        if (backupTimeoutRef.current) {
+            clearTimeout(backupTimeoutRef.current);
+        }
+
+        // Debounce backup (30 seconds)
+        backupTimeoutRef.current = setTimeout(async () => {
+            if (!isAutoBackupEnabled) return;
+
+            setAutoBackupStatus('saving');
+            const result = await performAutoBackup();
+
+            if (result.success) {
+                setAutoBackupStatus('idle');
+            } else {
+                if (result.error === 'permission-needed') {
+                    setAutoBackupStatus('permission-needed');
+                } else {
+                    setAutoBackupStatus('error');
+                }
+            }
+        }, 30000); // 30s debounce
+
+        return () => {
+            if (backupTimeoutRef.current) clearTimeout(backupTimeoutRef.current);
+        };
+    }, [isAutoBackupEnabled, workspaces, projects, tasks, columns, customViews, labels, theme]);
+
     const contextValue = useMemo(() => ({
         workspaces,
         activeWorkspaceId,
@@ -618,6 +714,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         tasks,
         columns,
         customViews,
+        labels,
         activeProjectId,
         searchQuery,
         isSidebarOpen,
@@ -631,6 +728,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         activeWorkspace,
         filteredProjects,
         filteredColumns,
+        recentViewGlobal,
         setActiveWorkspaceId,
         addWorkspace,
         updateWorkspace,
@@ -644,6 +742,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setSettingsOpen,
         setManageLabelsOpen,
         toggleTheme,
+        toggleRecentViewGlobal,
         openModal,
         closeModal,
         addProject,
@@ -662,14 +761,18 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         addCustomView,
         updateCustomView,
         deleteCustomView,
-        activeProject,
-        filteredTasks,
-        recentViewGlobal,
-        toggleRecentViewGlobal,
-        labels,
         addLabel,
         updateLabel,
-        deleteLabel
+        deleteLabel,
+        exportData,
+        importData: handleImportData,
+        isAutoBackupEnabled,
+        autoBackupStatus,
+        enableAutoBackup,
+        disableAutoBackup,
+        reauthorizeAutoBackup,
+        activeProject,
+        filteredTasks
     }), [
         workspaces,
         activeWorkspaceId,
@@ -677,6 +780,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         tasks,
         columns,
         customViews,
+        labels,
         activeProjectId,
         searchQuery,
         isSidebarOpen,
@@ -684,45 +788,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         viewFilter,
         priorityFilter,
         isSettingsOpen,
+        isManageLabelsOpen,
         theme,
         activeModal,
-        activeWorkspace,
-        filteredProjects,
-        filteredColumns,
-        addWorkspace,
-        updateWorkspace,
-        deleteWorkspace,
-        addProject,
-        updateProject,
-        deleteProject,
-        addTask,
-        updateTask,
-        moveTask,
-        deleteTask,
-        addSubtask,
-        toggleSubtask,
-        deleteSubtask,
-        addColumn,
-        updateColumn,
-        deleteColumn,
-        addCustomView,
-        updateCustomView,
-        deleteCustomView,
-        toggleSidebar,
-        toggleTheme,
-        openModal,
-        closeModal,
-        activeProject,
-        filteredTasks,
         recentViewGlobal,
-        toggleRecentViewGlobal,
-        labels,
-        addLabel,
-        updateLabel,
-        deleteLabel,
-        isManageLabelsOpen,
-        setManageLabelsOpen
+        isAutoBackupEnabled,
+        autoBackupStatus,
+        handleImportData
     ]);
+
 
     return (
         <StoreContext.Provider value={contextValue}>

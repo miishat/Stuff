@@ -4,7 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import { Board } from './components/Board';
 import { CommandPalette } from './components/CommandPalette';
 import { ManageLabelsModal } from './components/ManageLabelsModal';
-import { X, Moon, Sun, RefreshCw, Tags } from 'lucide-react';
+import { X, Moon, Sun, RefreshCw, Tags, Download, Upload, HardDrive } from 'lucide-react';
 
 
 // Helper for unbiased shuffling (Fisher-Yates)
@@ -18,7 +18,20 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 const SettingsModal: React.FC = () => {
-    const { isSettingsOpen, setSettingsOpen, theme, toggleTheme, setManageLabelsOpen } = useStore();
+    const {
+        isSettingsOpen,
+        setSettingsOpen,
+        theme,
+        toggleTheme,
+        setManageLabelsOpen,
+        exportData,
+        importData,
+        isAutoBackupEnabled,
+        autoBackupStatus,
+        enableAutoBackup,
+        disableAutoBackup,
+        reauthorizeAutoBackup
+    } = useStore();
 
     if (!isSettingsOpen) return null;
 
@@ -66,6 +79,102 @@ const SettingsModal: React.FC = () => {
                             <Tags className="w-5 h-5" />
                             <span className="text-sm font-medium">Manage Labels</span>
                         </button>
+                    </div>
+
+                    {/* Data & Backup */}
+                    <div>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Data & Backup</h3>
+                        <div className="space-y-3">
+                            {/* Auto-Backup Toggle */}
+                            <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-700 rounded-xl">
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-2 rounded-lg ${isAutoBackupEnabled ? 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+                                        <HardDrive className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-medium text-slate-900 dark:text-slate-100">Auto-Backup</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                            {isAutoBackupEnabled ? (
+                                                autoBackupStatus === 'saving' ? (
+                                                    <span className="flex items-center gap-1 text-brand-500"><RefreshCw className="w-3 h-3 animate-spin" /> Saving...</span>
+                                                ) : autoBackupStatus === 'permission-needed' ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-orange-500 font-medium">Permission needed</span>
+                                                        <button
+                                                            onClick={() => reauthorizeAutoBackup()}
+                                                            className="text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded hover:bg-orange-100 font-medium transition-colors"
+                                                        >
+                                                            Authorize
+                                                        </button>
+                                                    </div>
+                                                ) : autoBackupStatus === 'error' ? (
+                                                    <span className="text-red-500">Error saving</span>
+                                                ) : (
+                                                    'Enabled (local folder)'
+                                                )
+                                            ) : (
+                                                'Disabled'
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    {isAutoBackupEnabled && autoBackupStatus === 'permission-needed' && (
+                                        <button
+                                            onClick={() => enableAutoBackup()}
+                                            className="text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded hover:bg-orange-100 font-medium transition-colors"
+                                        >
+                                            Authorize
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => isAutoBackupEnabled ? disableAutoBackup() : enableAutoBackup()}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isAutoBackupEnabled ? 'bg-brand-600' : 'bg-slate-200 dark:bg-slate-700'}`}
+                                    >
+                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${isAutoBackupEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={exportData}
+                                className="w-full flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all text-slate-700 dark:text-slate-300"
+                            >
+                                <Download className="w-5 h-5" />
+                                <div className="text-left">
+                                    <span className="block text-sm font-medium">Export Data</span>
+                                    <span className="block text-xs text-slate-500 dark:text-slate-400">Save a backup of your workspace</span>
+                                </div>
+                            </button>
+                            <div className="relative">
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const confirm = window.confirm('This will replace all current data with the backup. Are you sure?');
+                                            if (confirm) {
+                                                importData(file).catch(err => {
+                                                    alert('Failed to import backup ' + err);
+                                                });
+                                            }
+                                        }
+                                        e.target.value = ''; // Reset
+                                    }}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                />
+                                <button
+                                    className="w-full flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all text-slate-700 dark:text-slate-300 pointer-events-none"
+                                >
+                                    <Upload className="w-5 h-5" />
+                                    <div className="text-left">
+                                        <span className="block text-sm font-medium">Import Backup</span>
+                                        <span className="block text-xs text-slate-500 dark:text-slate-400">Restore from a JSON file</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="pt-4 text-center text-xs text-slate-400 dark:text-slate-600 font-mono">

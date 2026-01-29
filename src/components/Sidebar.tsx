@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../context/Store';
-import { CheckSquare, Settings, PlusCircle, Trash2, Clock, Flag, Tag, Pencil, ChevronDown, Check, FolderPlus, Edit2, Globe } from 'lucide-react';
+import { CheckSquare, Settings, PlusCircle, Trash2, Clock, Flag, Tag, Pencil, ChevronDown, Check, FolderPlus, Edit2, Globe, BarChart3 } from 'lucide-react';
 import { CustomView, Project, Workspace } from '../types';
 import { CreateFilterModal } from './CreateFilterModal';
 
@@ -28,7 +28,9 @@ export const Sidebar: React.FC = () => {
         deleteCustomView,
         openModal,
         recentViewGlobal,
-        toggleRecentViewGlobal
+        toggleRecentViewGlobal,
+        currentView,
+        setCurrentView
     } = useStore();
 
     const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(false);
@@ -298,6 +300,29 @@ export const Sidebar: React.FC = () => {
 
                 {/* Navigation */}
                 <div className="flex-1 overflow-y-auto py-8 px-4 space-y-6 scrollbar-hide">
+                    {/* Overview Section */}
+                    <div className="space-y-1">
+                        <button
+                            onClick={() => setCurrentView('analytics')}
+                            className={`w-full flex items-center min-h-[44px] rounded-xl text-sm transition-all duration-200 group relative cursor-pointer overflow-hidden
+                            ${currentView === 'analytics'
+                                    ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 shadow-sm'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'}
+                            `}
+                            title="Dashboard"
+                        >
+                            {currentView === 'analytics' && (
+                                <div className="absolute inset-0 rounded-xl ring-1 ring-brand-500/20 dark:ring-brand-400/20 pointer-events-none"></div>
+                            )}
+
+                            <div className={`flex-shrink-0 flex items-center justify-center transition-all duration-500 ${isSidebarOpen ? 'w-12' : 'w-full'}`}>
+                                <BarChart3 className="w-5 h-5" />
+                            </div>
+                            <div className={`flex items-center flex-1 min-w-0 transition-opacity duration-500 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                                <span className="truncate flex-1 text-left font-medium">Dashboard</span>
+                            </div>
+                        </button>
+                    </div>
 
                     {/* Workspace Section */}
                     <div className="space-y-1">
