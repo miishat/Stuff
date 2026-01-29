@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Command } from 'cmdk';
 import { useStore } from '../context/Store';
-import { Search, Moon, Sun, Clock, Flag, Tag, Settings, Tags, Download, Upload, BarChart3 } from 'lucide-react';
+import { Search, Moon, Sun, Clock, Flag, Tag, Settings, Tags, Download, Upload, BarChart3, Layout, Calendar } from 'lucide-react';
 import { importData } from '../utils/backupUtils';
 
 export const CommandPalette: React.FC = () => {
@@ -75,6 +75,24 @@ export const CommandPalette: React.FC = () => {
                                 <Clock className="w-4 h-4" />
                             </div>
                             <span>Recents</span>
+                        </Command.Item>
+                        <Command.Item
+                            onSelect={() => runCommand(() => setCurrentView('board'))}
+                            className="flex items-center px-2 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 aria-selected:bg-brand-50 aria-selected:text-brand-700 dark:aria-selected:bg-brand-900/20 dark:aria-selected:text-brand-300 cursor-pointer transition-colors group"
+                        >
+                            <div className="flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-aria-selected:bg-brand-100 dark:group-aria-selected:bg-brand-900/40 group-aria-selected:text-brand-600 dark:group-aria-selected:text-brand-400 mr-3">
+                                <Layout className="w-4 h-4" />
+                            </div>
+                            <span>Board View</span>
+                        </Command.Item>
+                        <Command.Item
+                            onSelect={() => runCommand(() => setCurrentView('calendar'))}
+                            className="flex items-center px-2 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 aria-selected:bg-brand-50 aria-selected:text-brand-700 dark:aria-selected:bg-brand-900/20 dark:aria-selected:text-brand-300 cursor-pointer transition-colors group"
+                        >
+                            <div className="flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-aria-selected:bg-brand-100 dark:group-aria-selected:bg-brand-900/40 group-aria-selected:text-brand-600 dark:group-aria-selected:text-brand-400 mr-3">
+                                <Calendar className="w-4 h-4" />
+                            </div>
+                            <span>Calendar View</span>
                         </Command.Item>
                         <Command.Item
                             onSelect={() => runCommand(() => setCurrentView('analytics'))}
