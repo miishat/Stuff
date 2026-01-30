@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Priority } from '../types';
-import { X, Calendar, Flag, AlignLeft, Link as LinkIcon, ExternalLink, Tag, Plus, Trash2, CheckSquare, Check } from 'lucide-react';
+import { X, Calendar, Flag, AlignLeft, Link as LinkIcon, ExternalLink, Tag, Plus, Trash2, CheckSquare, Check, ChevronUp, ChevronDown } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { CustomDatePicker } from './CustomDatePicker';
 
@@ -10,7 +10,7 @@ interface TaskDetailProps {
 }
 
 export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
-    const { tasks, updateTask, deleteTask, projects, openModal, addSubtask, toggleSubtask, deleteSubtask, labels: storeLabels, addLabel: addLabelToStore } = useStore();
+    const { tasks, updateTask, deleteTask, projects, openModal, addSubtask, toggleSubtask, deleteSubtask, reorderSubtasks, labels: storeLabels, addLabel: addLabelToStore } = useStore();
     const task = tasks.find(t => t.id === taskId);
     const project = projects.find(p => p.id === task?.projectId);
     const [labelInput, setLabelInput] = useState('');
@@ -323,11 +323,30 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
 
                         {/* Subtask List */}
                         <div className="space-y-2 mb-4">
-                            {(task.subtasks || []).map(subtask => (
+                            {(task.subtasks || []).map((subtask, index) => (
                                 <div
                                     key={subtask.id}
-                                    className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/30 rounded-lg border border-slate-100 dark:border-slate-800/50 group"
+                                    className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800/30 rounded-lg border border-slate-100 dark:border-slate-800/50 group"
                                 >
+                                    {/* Reorder Buttons */}
+                                    <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={() => index > 0 && reorderSubtasks(taskId!, index, index - 1)}
+                                            disabled={index === 0}
+                                            className="p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                            title="Move up"
+                                        >
+                                            <ChevronUp className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={() => index < (task.subtasks?.length || 0) - 1 && reorderSubtasks(taskId!, index, index + 1)}
+                                            disabled={index === (task.subtasks?.length || 0) - 1}
+                                            className="p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                            title="Move down"
+                                        >
+                                            <ChevronDown className="w-3 h-3" />
+                                        </button>
+                                    </div>
                                     <button
                                         onClick={() => toggleSubtask(taskId!, subtask.id)}
                                         className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${subtask.completed

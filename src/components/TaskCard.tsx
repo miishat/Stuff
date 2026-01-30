@@ -82,18 +82,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
                         🔗 Link
                     </a>
                 )}
-
-                {/* Delete Button */}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        deleteTask(task.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                    title="Delete Task"
-                >
-                    <Trash2 className="w-3.5 h-3.5" />
-                </button>
             </div>
 
             {/* Title */}
@@ -182,15 +170,27 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
                 </div>
             )}
 
-            {/* Footer: Due Date */}
-            {task.dueDate && (
-                <div className="pt-2 border-t border-slate-50 dark:border-slate-800/50">
+            {/* Footer: Due Date + Delete */}
+            <div className="pt-2 border-t border-slate-50 dark:border-slate-800/50 flex items-center justify-between">
+                {task.dueDate ? (
                     <div className={`flex items-center text-[11px] font-medium ${isOverdue ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'}`}>
                         <Calendar className="w-3 h-3 mr-1.5" />
                         {new Date(task.dueDate + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                     </div>
-                </div>
-            )}
+                ) : (
+                    <div></div>
+                )}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        deleteTask(task.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all -mr-1.5"
+                    title="Delete Task"
+                >
+                    <Trash2 className="w-3.5 h-3.5" />
+                </button>
+            </div>
         </div>
     );
 };

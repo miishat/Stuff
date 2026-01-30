@@ -71,6 +71,7 @@ interface StoreContextType {
     addSubtask: (taskId: string, title: string) => void;
     toggleSubtask: (taskId: string, subtaskId: string) => void;
     deleteSubtask: (taskId: string, subtaskId: string) => void;
+    reorderSubtasks: (taskId: string, fromIndex: number, toIndex: number) => void;
 
     addColumn: () => void;
     updateColumn: (id: string, title: string) => void;
@@ -618,6 +619,18 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }));
     }, []);
 
+    const reorderSubtasks = useCallback((taskId: string, fromIndex: number, toIndex: number) => {
+        setTasks(prev => prev.map(t => {
+            if (t.id === taskId && t.subtasks) {
+                const newSubtasks = [...t.subtasks];
+                const [removed] = newSubtasks.splice(fromIndex, 1);
+                newSubtasks.splice(toIndex, 0, removed);
+                return { ...t, subtasks: newSubtasks };
+            }
+            return t;
+        }));
+    }, []);
+
     const addColumn = useCallback(() => {
         // Determine which project this column belongs to.
         const targetProjectId = activeProjectId || filteredProjects[0]?.id;
@@ -818,6 +831,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         addSubtask,
         toggleSubtask,
         deleteSubtask,
+        reorderSubtasks,
         addColumn,
         updateColumn,
         deleteColumn,
