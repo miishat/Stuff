@@ -209,7 +209,7 @@ const SettingsModal: React.FC = () => {
                     </div>
 
                     <div className="pt-4 text-center text-xs text-slate-400 dark:text-slate-600 font-mono">
-                        <div>Stuff v1.0.0</div>
+                        <div>Stuff v1.0.1</div>
                         <div className="mt-1">Made by <a href="https://github.com/miishat" target="_blank" rel="noopener noreferrer" className="hover:text-brand-500 transition-colors">@Mishat</a></div>
                     </div>
                 </div>
