@@ -5,6 +5,7 @@ import { Board } from './components/Board';
 import { CommandPalette } from './components/CommandPalette';
 import { ManageLabelsModal } from './components/ManageLabelsModal';
 import { UndoToast } from './components/UndoToast';
+import { UpdatePrompt } from './components/UpdatePrompt';
 import { X, Moon, Sun, RefreshCw, Tags, Download, Upload, HardDrive, Archive } from 'lucide-react';
 
 
@@ -361,6 +362,7 @@ function App() {
                 <SettingsModal />
                 <GlobalLabelsModal />
                 <UndoToast />
+                <UpdatePrompt />
                 <Sidebar />
                 <div className="flex-1 overflow-hidden relative">
                     <Board />

@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [
         react(),
         VitePWA({
-            registerType: 'autoUpdate',
+            registerType: 'prompt',
             includeAssets: ['icon.svg', 'apple-touch-icon.png', 'mask-icon.svg'],
             manifest: {
                 name: 'Stuff - Task Manager',
