@@ -3,6 +3,7 @@ import { Priority } from '../types';
 import { X, Calendar, Flag, AlignLeft, Link as LinkIcon, ExternalLink, Tag, Plus, Trash2, CheckSquare, Check, ChevronUp, ChevronDown } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { CustomDatePicker } from './CustomDatePicker';
+import { RichTextEditor } from './RichTextEditor';
 
 interface TaskDetailProps {
     taskId: string | null;
@@ -306,14 +307,11 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
                     </div>
 
                     {/* Description Area */}
-                    <div className="group min-h-[200px] bg-slate-50 dark:bg-slate-800/30 rounded-xl border border-slate-100 dark:border-slate-800/50 p-4 focus-within:ring-2 focus-within:ring-brand-500/20 focus:border-brand-500 transition-all">
-                        <textarea
-                            value={task.description}
-                            onChange={(e) => updateTask(taskId, { description: e.target.value })}
-                            className="w-full h-full min-h-[200px] resize-none border-none focus:ring-0 text-slate-600 dark:text-slate-300 leading-relaxed bg-transparent p-0 text-sm"
-                            placeholder="Add a more detailed description..."
-                        />
-                    </div>
+                    <RichTextEditor
+                        content={task.description}
+                        onChange={(content) => updateTask(taskId, { description: content })}
+                        placeholder="Add a more detailed description..."
+                    />
 
                     {/* Subtasks Section */}
                     <div className="mt-8">
