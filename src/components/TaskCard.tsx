@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { Task } from '../types';
-import { Calendar, Flag, CheckSquare, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Calendar, Flag, CheckSquare, ChevronDown, ChevronUp, Check, Trash2 } from 'lucide-react';
 import { useStore } from '../context/Store';
 
 interface TaskCardProps {
@@ -11,7 +11,7 @@ interface TaskCardProps {
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const { toggleSubtask, labels } = useStore();
+    const { toggleSubtask, labels, deleteTask } = useStore();
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: task.id,
@@ -82,6 +82,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
                         🔗 Link
                     </a>
                 )}
+
+                {/* Delete Button */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        deleteTask(task.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                    title="Delete Task"
+                >
+                    <Trash2 className="w-3.5 h-3.5" />
+                </button>
             </div>
 
             {/* Title */}

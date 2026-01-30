@@ -144,7 +144,7 @@ export const AnalyticsView: React.FC = () => {
                         </div>
                         <div className="flex items-baseline gap-2 text-lg font-medium text-slate-600 dark:text-slate-300">
                             <span className="font-bold text-slate-900 dark:text-white">{stats.overdue}</span>
-                            Tasks require attention
+                            {stats.overdue === 1 ? 'Task requires attention' : 'Tasks require attention'}
                         </div>
                     </div>
                 </div>
@@ -164,7 +164,7 @@ export const AnalyticsView: React.FC = () => {
                                     <span className="text-slate-600 dark:text-slate-300 flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-orange-500"></div> High Priority
                                     </span>
-                                    <span className="text-slate-900 dark:text-white">{stats.byPriority.high} <span className="text-slate-400 font-normal text-xs">tasks</span></span>
+                                    <span className="text-slate-900 dark:text-white">{stats.byPriority.high} <span className="text-slate-400 font-normal text-xs">{stats.byPriority.high === 1 ? 'task' : 'tasks'}</span></span>
                                 </div>
                                 <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div
@@ -182,7 +182,7 @@ export const AnalyticsView: React.FC = () => {
                                     <span className="text-slate-600 dark:text-slate-300 flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-brand-500"></div> Medium Priority
                                     </span>
-                                    <span className="text-slate-900 dark:text-white">{stats.byPriority.medium} <span className="text-slate-400 font-normal text-xs">tasks</span></span>
+                                    <span className="text-slate-900 dark:text-white">{stats.byPriority.medium} <span className="text-slate-400 font-normal text-xs">{stats.byPriority.medium === 1 ? 'task' : 'tasks'}</span></span>
                                 </div>
                                 <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div
@@ -200,7 +200,7 @@ export const AnalyticsView: React.FC = () => {
                                     <span className="text-slate-600 dark:text-slate-300 flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-slate-400"></div> Low Priority
                                     </span>
-                                    <span className="text-slate-900 dark:text-white">{stats.byPriority.low} <span className="text-slate-400 font-normal text-xs">tasks</span></span>
+                                    <span className="text-slate-900 dark:text-white">{stats.byPriority.low} <span className="text-slate-400 font-normal text-xs">{stats.byPriority.low === 1 ? 'task' : 'tasks'}</span></span>
                                 </div>
                                 <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div

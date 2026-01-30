@@ -4,7 +4,8 @@ import { Sidebar } from './components/Sidebar';
 import { Board } from './components/Board';
 import { CommandPalette } from './components/CommandPalette';
 import { ManageLabelsModal } from './components/ManageLabelsModal';
-import { X, Moon, Sun, RefreshCw, Tags, Download, Upload, HardDrive } from 'lucide-react';
+import { UndoToast } from './components/UndoToast';
+import { X, Moon, Sun, RefreshCw, Tags, Download, Upload, HardDrive, Archive } from 'lucide-react';
 
 
 // Helper for unbiased shuffling (Fisher-Yates)
@@ -30,7 +31,8 @@ const SettingsModal: React.FC = () => {
         autoBackupStatus,
         enableAutoBackup,
         disableAutoBackup,
-        reauthorizeAutoBackup
+        reauthorizeAutoBackup,
+        setCurrentView
     } = useStore();
 
     // Close on Escape
@@ -89,6 +91,24 @@ const SettingsModal: React.FC = () => {
                         >
                             <Tags className="w-5 h-5" />
                             <span className="text-sm font-medium">Manage Labels</span>
+                        </button>
+                    </div>
+
+                    {/* Archive */}
+                    <div>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Archive</h3>
+                        <button
+                            onClick={() => {
+                                setSettingsOpen(false);
+                                setCurrentView('archive');
+                            }}
+                            className="w-full flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all text-slate-700 dark:text-slate-300"
+                        >
+                            <Archive className="w-5 h-5" />
+                            <div className="text-left">
+                                <span className="block text-sm font-medium">View Archive</span>
+                                <span className="block text-xs text-slate-500 dark:text-slate-400">Recover deleted tasks</span>
+                            </div>
                         </button>
                     </div>
 
@@ -340,6 +360,7 @@ function App() {
                 <GlobalModal />
                 <SettingsModal />
                 <GlobalLabelsModal />
+                <UndoToast />
                 <Sidebar />
                 <div className="flex-1 overflow-hidden relative">
                     <Board />

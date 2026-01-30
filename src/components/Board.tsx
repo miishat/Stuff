@@ -7,6 +7,7 @@ import { TaskCard } from './TaskCard';
 import { TaskDetail } from './TaskDetail';
 import { CalendarView } from './CalendarView';
 import { AnalyticsView } from './AnalyticsView';
+import { ArchiveView } from './ArchiveView';
 import { Search, Filter, Kanban, Calendar as CalendarIcon, Plus, ChevronRight, BarChart3 } from 'lucide-react';
 
 export const Board: React.FC = () => {
@@ -374,11 +375,15 @@ export const Board: React.FC = () => {
                         <CalendarView onTaskClick={(t) => setDetailTaskId(t.id)} />
                     </div>
                 </div>
-            ) : (
+            ) : currentView === 'analytics' ? (
                 <div className="flex-1 overflow-hidden">
                     <AnalyticsView />
                 </div>
-            )}
+            ) : currentView === 'archive' ? (
+                <div className="flex-1 overflow-hidden">
+                    <ArchiveView />
+                </div>
+            ) : null}
 
             {/* Task Detail Modal */}
             {detailTaskId && (

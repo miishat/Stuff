@@ -31,6 +31,7 @@ export interface Task {
     labels: string[];
     ticketLink?: string;
     subtasks?: Subtask[];
+    archivedAt?: string; // ISO date string when task was archived
 }
 
 export interface Project {

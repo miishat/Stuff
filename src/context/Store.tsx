@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useMemo, useEffect, useCall
 import { Project, Task, ColumnId, ColumnConfig, CustomView, Workspace, Label } from '../types';
 import { exportData, importData, setupAutoBackup, performAutoBackup, verifyBackupPermission } from '../utils/backupUtils';
 
-export type ViewType = 'board' | 'calendar' | 'analytics';
+export type ViewType = 'board' | 'calendar' | 'analytics' | 'archive';
 export type ViewFilter = 'project' | 'recent' | string; // 'project', 'recent', or custom view ID
 export type Theme = 'light' | 'dark';
 
@@ -35,6 +35,8 @@ interface StoreContextType {
     theme: Theme;
     activeModal: ModalConfig | null;
     recentViewGlobal: boolean;
+    archivedTasks: Task[];
+    pendingArchive: { task: Task; timeoutId: number } | null;
 
     // Actions
     setActiveWorkspaceId: (id: string) => void;
@@ -96,6 +98,11 @@ interface StoreContextType {
     enableAutoBackup: () => Promise<boolean>;
     disableAutoBackup: () => void;
     reauthorizeAutoBackup: () => Promise<void>;
+
+    // Archive
+    undoArchiveTask: () => void;
+    restoreTask: (taskId: string) => void;
+    permanentlyDeleteTask: (taskId: string) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -112,6 +119,7 @@ const STORAGE_KEYS = {
     activeProjectId: 'stuff_activeProjectId',
     labels: 'stuff_labels',
     autoBackupEnabled: 'stuff_autoBackupEnabled',
+    archivedTasks: 'stuff_archivedTasks',
 };
 
 // Helper functions for localStorage
@@ -256,6 +264,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [autoBackupStatus, setAutoBackupStatus] = useState<'idle' | 'saving' | 'saved' | 'error' | 'permission-needed'>('idle');
     const backupTimeoutRef = React.useRef<any>(null);
 
+    // Archive State
+    const [archivedTasks, setArchivedTasks] = useState<Task[]>(() =>
+        loadFromStorage(STORAGE_KEYS.archivedTasks, [])
+    );
+    const [pendingArchive, setPendingArchive] = useState<{ task: Task; timeoutId: number } | null>(null);
+
     // Save data to localStorage whenever it changes
     useEffect(() => {
         saveToStorage(STORAGE_KEYS.workspaces, workspaces);
@@ -292,6 +306,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     useEffect(() => {
         saveToStorage(STORAGE_KEYS.activeProjectId, activeProjectId);
     }, [activeProjectId]);
+
+    useEffect(() => {
+        saveToStorage(STORAGE_KEYS.archivedTasks, archivedTasks);
+    }, [archivedTasks]);
 
     // Sync theme with document
     useEffect(() => {
@@ -519,7 +537,52 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }, []);
 
     const deleteTask = useCallback((taskId: string) => {
+        // Find the task before removing
+        const taskToArchive = tasks.find(t => t.id === taskId);
+        if (!taskToArchive) return;
+
+        // Remove from active tasks
         setTasks(prev => prev.filter(t => t.id !== taskId));
+
+        // Clear any existing pending archive timeout
+        if (pendingArchive) {
+            clearTimeout(pendingArchive.timeoutId);
+            // Move the previously pending task to archive
+            setArchivedTasks(prev => [...prev, { ...pendingArchive.task, archivedAt: new Date().toISOString() }]);
+        }
+
+        // Set up new pending archive with 5 second undo window
+        const timeoutId = window.setTimeout(() => {
+            setArchivedTasks(prev => [...prev, { ...taskToArchive, archivedAt: new Date().toISOString() }]);
+            setPendingArchive(null);
+        }, 5000);
+
+        setPendingArchive({ task: taskToArchive, timeoutId });
+    }, [tasks, pendingArchive]);
+
+    const undoArchiveTask = useCallback(() => {
+        if (!pendingArchive) return;
+
+        // Clear the timeout
+        clearTimeout(pendingArchive.timeoutId);
+
+        // Restore the task
+        setTasks(prev => [...prev, pendingArchive.task]);
+        setPendingArchive(null);
+    }, [pendingArchive]);
+
+    const restoreTask = useCallback((taskId: string) => {
+        const taskToRestore = archivedTasks.find(t => t.id === taskId);
+        if (!taskToRestore) return;
+
+        // Remove archivedAt and restore
+        const { archivedAt, ...restoredTask } = taskToRestore;
+        setTasks(prev => [...prev, restoredTask as Task]);
+        setArchivedTasks(prev => prev.filter(t => t.id !== taskId));
+    }, [archivedTasks]);
+
+    const permanentlyDeleteTask = useCallback((taskId: string) => {
+        setArchivedTasks(prev => prev.filter(t => t.id !== taskId));
     }, []);
 
     const addSubtask = useCallback((taskId: string, title: string) => {
@@ -772,7 +835,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         disableAutoBackup,
         reauthorizeAutoBackup,
         activeProject,
-        filteredTasks
+        filteredTasks,
+        archivedTasks,
+        pendingArchive,
+        undoArchiveTask,
+        restoreTask,
+        permanentlyDeleteTask
     }), [
         workspaces,
         activeWorkspaceId,
@@ -794,7 +862,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         recentViewGlobal,
         isAutoBackupEnabled,
         autoBackupStatus,
-        handleImportData
+        handleImportData,
+        archivedTasks,
+        pendingArchive,
+        undoArchiveTask,
+        restoreTask,
+        permanentlyDeleteTask
     ]);
 
 
