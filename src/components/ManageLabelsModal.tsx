@@ -61,6 +61,15 @@ export const ManageLabelsModal: React.FC<ManageLabelsModalProps> = ({ onClose })
         return () => window.removeEventListener('scroll', handleScroll, true);
     }, [colorPickerState]);
 
+    // Close on Escape
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
     const handleAddLabel = () => {
         if (newLabelName.trim()) {
             addLabel(newLabelName.trim(), selectedColor.class);

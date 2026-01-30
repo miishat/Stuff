@@ -33,6 +33,17 @@ const SettingsModal: React.FC = () => {
         reauthorizeAutoBackup
     } = useStore();
 
+    // Close on Escape
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setSettingsOpen(false);
+        };
+        if (isSettingsOpen) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isSettingsOpen, setSettingsOpen]);
+
     if (!isSettingsOpen) return null;
 
     return (
@@ -213,6 +224,17 @@ const GlobalModal: React.FC = () => {
             setVisibleOptions(shuffled.slice(0, 25));
         }
     }, [activeModal]);
+
+    // Close on Escape
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') closeModal();
+        };
+        if (activeModal) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [activeModal, closeModal]);
 
     if (!activeModal) return null;
 

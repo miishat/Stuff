@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Command } from 'cmdk';
 import { useStore } from '../context/Store';
-import { Search, Moon, Sun, Clock, Flag, Tag, Settings, Tags, Download, Upload, BarChart3, Layout, Calendar } from 'lucide-react';
+import { Search, Moon, Sun, Clock, Flag, Tag, Settings, Tags, Download, Upload, BarChart3, Layout, Calendar, Briefcase } from 'lucide-react';
 import { importData } from '../utils/backupUtils';
 
 export const CommandPalette: React.FC = () => {
@@ -15,7 +15,10 @@ export const CommandPalette: React.FC = () => {
         toggleTheme,
         setSettingsOpen,
         setManageLabelsOpen,
-        exportData
+        exportData,
+        workspaces,
+        setActiveWorkspaceId,
+        activeWorkspaceId
     } = useStore();
 
     // Toggle the menu when ⌘K is pressed
@@ -225,6 +228,28 @@ export const CommandPalette: React.FC = () => {
                             <span>Dark Mode</span>
                         </Command.Item>
                     </Command.Group>
+
+                    {/* Workspaces */}
+                    {workspaces.length > 0 && (
+                        <Command.Group className="mb-2">
+                            <div className="px-2 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Workspaces</div>
+                            {workspaces.map(workspace => (
+                                <Command.Item
+                                    key={workspace.id}
+                                    onSelect={() => runCommand(() => setActiveWorkspaceId(workspace.id))}
+                                    className="flex items-center px-2 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 aria-selected:bg-brand-50 aria-selected:text-brand-700 dark:aria-selected:bg-brand-900/20 dark:aria-selected:text-brand-300 cursor-pointer transition-colors group"
+                                >
+                                    <div className="flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-aria-selected:bg-brand-100 dark:group-aria-selected:bg-brand-900/40 group-aria-selected:text-brand-600 dark:group-aria-selected:text-brand-400 mr-3">
+                                        <Briefcase className="w-4 h-4" />
+                                    </div>
+                                    <span>{workspace.name}</span>
+                                    {activeWorkspaceId === workspace.id && (
+                                        <span className="ml-auto text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded">Active</span>
+                                    )}
+                                </Command.Item>
+                            ))}
+                        </Command.Group>
+                    )}
 
                 </Command.List>
 
