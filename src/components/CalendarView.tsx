@@ -78,7 +78,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
     const [isScopeMenuOpen, setIsScopeMenuOpen] = useState(false);
     const [activeDragTask, setActiveDragTask] = useState<Task | null>(null);
 
-    const doneColumn = useMemo(() => columns.find(c => c.title === 'Done'), [columns]);
+    const doneColumnIds = useMemo(() => {
+        return new Set(columns.filter(c => c.title.toLowerCase() === 'done').map(c => c.id));
+    }, [columns]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -265,7 +267,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                                                             key={task.id}
                                                             task={task}
                                                             onClick={onTaskClick}
-                                                            isDone={doneColumn && task.columnId === doneColumn.id}
+                                                            isDone={doneColumnIds.has(task.columnId)}
                                                             isOverdue={!!isTaskOverdue}
                                                         />
                                                     );
@@ -310,7 +312,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
                             </div>
                             <div className="p-3 overflow-y-auto space-y-2">
                                 {getTasksForDay(expandedDay!).tasks.map(task => {
-                                    const isTaskDone = doneColumn && task.columnId === doneColumn.id;
+                                    const isTaskDone = doneColumnIds.has(task.columnId);
                                     const today = new Date();
                                     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                                     const isTaskOverdue = !isTaskDone && task.dueDate && task.dueDate < todayStr;
