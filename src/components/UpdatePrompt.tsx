@@ -1,7 +1,19 @@
+/**
+ * @file UpdatePrompt.tsx
+ * @description PWA update notification component.
+ *              Prompts users when a new service worker is available
+ *              and allows immediate update or dismissal.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import { useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { RefreshCw, X } from 'lucide-react';
 
+/**
+ * UpdatePrompt component - Notification for PWA updates.
+ */
 export const UpdatePrompt: React.FC = () => {
     const [showPrompt, setShowPrompt] = useState(false);
 

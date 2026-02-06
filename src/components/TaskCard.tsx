@@ -1,3 +1,12 @@
+/**
+ * @file TaskCard.tsx
+ * @description Draggable task card component for the kanban board.
+ *              Displays task summary including priority, labels, due date,
+ *              subtask progress, and supports drag-and-drop functionality.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { Task } from '../types';
@@ -5,11 +14,19 @@ import { Calendar, Flag, CheckSquare, ChevronDown, ChevronUp, Check, Trash2 } fr
 import { useStore } from '../context/Store';
 import { stripHtml } from '../utils/text';
 
+/**
+ * Props for the TaskCard component.
+ */
 interface TaskCardProps {
+    /** The task data to display */
     task: Task;
+    /** Callback when the card is clicked */
     onClick: () => void;
 }
 
+/**
+ * TaskCard component - Interactive card representing a task on the board.
+ */
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const { toggleSubtask, labels, deleteTask } = useStore();

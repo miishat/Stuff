@@ -1,3 +1,12 @@
+/**
+ * @file CalendarView.tsx
+ * @description Monthly calendar view component for task scheduling.
+ *              Displays tasks by due date with drag-and-drop date reassignment,
+ *              scope filtering (project/workspace/all), and day expansion.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { Task } from '../types';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
@@ -5,6 +14,9 @@ import { useStore } from '../context/Store';
 import { DndContext, useDraggable, useDroppable, DragEndEvent, DragOverlay, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 
+/**
+ * Props for the CalendarView component.
+ */
 interface CalendarViewProps {
     onTaskClick: (task: Task) => void;
 }

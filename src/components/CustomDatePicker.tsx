@@ -1,6 +1,17 @@
+/**
+ * @file CustomDatePicker.tsx
+ * @description Custom date picker component with calendar popup.
+ *              Provides month navigation, visual day selection, and date clearing.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
+/**
+ * Props for the CustomDatePicker component.
+ */
 interface CustomDatePickerProps {
     value: string | undefined;
     onChange: (date: string | undefined) => void;

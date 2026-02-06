@@ -1,7 +1,18 @@
+/**
+ * @file UndoToast.tsx
+ * @description Toast notification component for undo archive action.
+ *              Displays at bottom of screen with undo button after task archival.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React from 'react';
 import { useStore } from '../context/Store';
 import { Undo2 } from 'lucide-react';
 
+/**
+ * UndoToast component - Toast notification with undo button for archived tasks.
+ */
 export const UndoToast: React.FC = () => {
     const { pendingArchive, undoArchiveTask } = useStore();
 

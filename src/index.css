@@ -1,8 +1,19 @@
+/**
+ * @file index.css
+ * @description Main stylesheet for the Stuff task management application.
+ *              Contains Tailwind CSS imports, custom scrollbar styles,
+ *              glassmorphism effects, and TipTap rich text editor styling.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Scrollbar */
+/* ============================================
+   Custom Scrollbar Styles
+   ============================================ */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;

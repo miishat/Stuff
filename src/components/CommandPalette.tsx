@@ -1,9 +1,22 @@
+/**
+ * @file CommandPalette.tsx
+ * @description Keyboard-driven command palette component (Cmd+K).
+ *              Provides quick access to navigation, projects, filters,
+ *              theme switching, data export/import, and workspace management.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useEffect, useState } from 'react';
 import { Command } from 'cmdk';
 import { useStore } from '../context/Store';
 import { Search, Moon, Sun, Clock, Flag, Tag, Settings, Tags, Download, Upload, BarChart3, Layout, Calendar, Briefcase, Archive } from 'lucide-react';
 import { importData } from '../utils/backupUtils';
 
+/**
+ * CommandPalette component - Global keyboard shortcut interface.
+ * Activated with Cmd+K or Ctrl+K for quick application navigation.
+ */
 export const CommandPalette: React.FC = () => {
     const [open, setOpen] = useState(false);
     const {

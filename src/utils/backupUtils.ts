@@ -1,15 +1,41 @@
+/**
+ * @file backupUtils.ts
+ * @description Backup and restore utilities for the Stuff application.
+ *              Provides functionality for manual data export/import and
+ *              automatic local folder backup using the File System Access API.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
+/**
+ * Structure of the backup data file.
+ * Contains all application state that needs to be persisted.
+ */
 export interface BackupData {
+    /** Array of workspace objects */
     workspaces: any[];
+    /** Array of project objects */
     projects: any[];
+    /** Array of task objects */
     tasks: any[];
+    /** Array of column configuration objects */
     columns: any[];
+    /** Array of custom view objects */
     customViews: any[];
+    /** Array of label objects */
     labels: any[];
+    /** Current theme setting */
     theme: any;
+    /** Unix timestamp when backup was created */
     timestamp: number;
+    /** Backup format version number */
     version: number;
 }
 
+/**
+ * LocalStorage keys used by the application.
+ * These keys are used for both saving and restoring data.
+ */
 const STORAGE_KEYS = [
     'stuff_workspaces',
     'stuff_projects',
@@ -20,6 +46,11 @@ const STORAGE_KEYS = [
     'stuff_theme'
 ];
 
+/**
+ * Exports all application data to a downloadable JSON file.
+ * Creates a timestamped backup file with all workspaces, projects, tasks, etc.
+ * @returns {void}
+ */
 export const exportData = (): void => {
     const data: any = {};
     STORAGE_KEYS.forEach(key => {
@@ -44,6 +75,14 @@ export const exportData = (): void => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 };
+
+/**
+ * Imports application data from a backup JSON file.
+ * Validates the file and restores all workspaces, projects, tasks, etc.
+ * @param {File} file - The backup JSON file to import
+ * @returns {Promise<boolean>} Promise resolving to true if import succeeded
+ * @throws {Error} If the file is invalid or import fails
+ */
 
 export const importData = (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {

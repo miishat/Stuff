@@ -1,3 +1,12 @@
+/**
+ * @file App.tsx
+ * @description Main application component for Stuff - a modern task management application.
+ *              This file contains the root App component, settings modal, global modals,
+ *              and orchestrates the overall application structure.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState, useEffect } from 'react';
 import { StoreProvider, useStore } from './context/Store';
 import { Sidebar } from './components/Sidebar';
@@ -9,7 +18,12 @@ import { UpdatePrompt } from './components/UpdatePrompt';
 import { X, Moon, Sun, RefreshCw, Tags, Download, Upload, HardDrive, Archive } from 'lucide-react';
 
 
-// Helper for unbiased shuffling (Fisher-Yates)
+/**
+ * Fisher-Yates shuffle algorithm for unbiased array randomization.
+ * @template T - The type of elements in the array
+ * @param {T[]} array - The array to shuffle
+ * @returns {T[]} A new shuffled array
+ */
 const shuffleArray = <T,>(array: T[]): T[] => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -210,7 +224,7 @@ const SettingsModal: React.FC = () => {
                     </div>
 
                     <div className="pt-4 text-center text-xs text-slate-400 dark:text-slate-600 font-mono">
-                        <div>Stuff v1.0.1</div>
+                        <div>Stuff v1.0.2</div>
                         <div className="mt-1">Made by <a href="https://github.com/miishat" target="_blank" rel="noopener noreferrer" className="hover:text-brand-500 transition-colors">@Mishat</a></div>
                     </div>
                 </div>

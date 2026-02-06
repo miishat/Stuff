@@ -1,3 +1,11 @@
+/**
+ * @file RichTextEditor.tsx
+ * @description Rich text editor component using TipTap library.
+ *              Provides formatting toolbar with bold, italic, lists, links, and undo/redo.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -5,6 +13,9 @@ import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo } from 'lucide-react';
 
+/**
+ * Props for the RichTextEditor component.
+ */
 interface RichTextEditorProps {
     content: string;
     onChange: (content: string) => void;
@@ -23,8 +34,8 @@ const MenuButton: React.FC<{
         disabled={disabled}
         title={title}
         className={`p-1.5 rounded transition-colors ${isActive
-                ? 'bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400'
-                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200'
+            ? 'bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400'
+            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
     >
         {children}

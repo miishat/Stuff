@@ -1,10 +1,25 @@
+/**
+ * @file AnalyticsView.tsx
+ * @description Analytics dashboard component for productivity insights.
+ *              Displays KPI cards, priority breakdown charts, and upcoming tasks
+ *              with scope filtering (project/workspace/all).
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useMemo, useState } from 'react';
 import { useStore } from '../context/Store';
 import { Task } from '../types';
 import { CheckCircle2, AlertCircle, Clock, TrendingUp, ChevronDown, Layers, Layout, Globe } from 'lucide-react';
 
+/**
+ * Dashboard scope type for filtering analytics data.
+ */
 type DashboardScope = 'project' | 'workspace' | 'all';
 
+/**
+ * AnalyticsView component - Productivity dashboard with KPIs and charts.
+ */
 export const AnalyticsView: React.FC = () => {
     const { tasks, projects, activeProjectId, activeWorkspaceId } = useStore();
     const [scope, setScope] = useState<DashboardScope>('project');

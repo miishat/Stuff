@@ -1,9 +1,22 @@
+/**
+ * @file Sidebar.tsx
+ * @description Navigation sidebar component for the Stuff application.
+ *              Provides workspace switching, project navigation, custom filter
+ *              views, and settings access with smooth open/collapse animations.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../context/Store';
 import { CheckSquare, Settings, PlusCircle, Trash2, Clock, Flag, Tag, Pencil, ChevronDown, Check, FolderPlus, Edit2, Globe, BarChart3 } from 'lucide-react';
 import { CustomView, Project, Workspace } from '../types';
 import { CreateFilterModal } from './CreateFilterModal';
 
+/**
+ * Sidebar component - Main navigation panel.
+ * Features collapsible design, workspace management, project list, and custom filters.
+ */
 export const Sidebar: React.FC = () => {
     const {
         workspaces,

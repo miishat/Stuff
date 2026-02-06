@@ -1,7 +1,18 @@
+/**
+ * @file ArchiveView.tsx
+ * @description Archive view component for managing deleted tasks.
+ *              Allows viewing, restoring, and permanently deleting archived tasks.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React from 'react';
 import { useStore } from '../context/Store';
 import { Archive, RotateCcw, Trash2, Clock } from 'lucide-react';
 
+/**
+ * ArchiveView component - Interface for managing archived/deleted tasks.
+ */
 export const ArchiveView: React.FC = () => {
     const { archivedTasks, restoreTask, permanentlyDeleteTask, openModal } = useStore();
 
@@ -60,8 +71,8 @@ export const ArchiveView: React.FC = () => {
                                     )}
                                     <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
                                         <span className={`px-2 py-0.5 rounded-full ${task.priority === 'High' ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
-                                                task.priority === 'Medium' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
-                                                    'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                                            task.priority === 'Medium' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
+                                                'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                                             }`}>
                                             {task.priority}
                                         </span>

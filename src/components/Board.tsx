@@ -1,3 +1,12 @@
+/**
+ * @file Board.tsx
+ * @description Main kanban board component for the Stuff application.
+ *              Handles drag-and-drop task management, view switching between
+ *              board/calendar/analytics views, and task filtering.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/Store';
 import { Column } from './Column';
@@ -10,6 +19,10 @@ import { AnalyticsView } from './AnalyticsView';
 import { ArchiveView } from './ArchiveView';
 import { Search, Filter, Kanban, Calendar as CalendarIcon, Plus, ChevronRight, BarChart3 } from 'lucide-react';
 
+/**
+ * Board component - Main content area for task management.
+ * Supports drag-and-drop, filtering, and multiple view modes.
+ */
 export const Board: React.FC = () => {
     const {
         filteredTasks,

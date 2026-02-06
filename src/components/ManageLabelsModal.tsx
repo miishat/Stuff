@@ -1,8 +1,20 @@
+/**
+ * @file ManageLabelsModal.tsx
+ * @description Modal component for managing project labels.
+ *              Allows creating, renaming, recoloring, and deleting labels.
+ *              Features a 30-color palette for label customization.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState } from 'react';
 import { X, Plus, Trash2, Check } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { Label } from '../types';
 
+/**
+ * Props for the ManageLabelsModal component.
+ */
 interface ManageLabelsModalProps {
     onClose: () => void;
 }

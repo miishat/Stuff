@@ -1,3 +1,12 @@
+/**
+ * @file Column.tsx
+ * @description Kanban column component for the Stuff application.
+ *              Renders a droppable column with header, task list, and add task button.
+ *              Supports inline editing of column titles and deletion.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ColumnConfig, Task } from '../types';
@@ -5,6 +14,9 @@ import { TaskCard } from './TaskCard';
 import { Plus, Trash } from 'lucide-react';
 import { useStore } from '../context/Store';
 
+/**
+ * Props for the Column component.
+ */
 interface ColumnProps {
     config: ColumnConfig;
     tasks: Task[];

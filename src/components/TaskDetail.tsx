@@ -1,3 +1,12 @@
+/**
+ * @file TaskDetail.tsx
+ * @description Task detail side panel component for the Stuff application.
+ *              Provides full task editing including title, description (rich text),
+ *              priority, due date, labels, ticket links, and subtasks.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Priority } from '../types';
 import { X, Calendar, Flag, AlignLeft, Link as LinkIcon, ExternalLink, Tag, Plus, Trash2, CheckSquare, Check, ChevronUp, ChevronDown } from 'lucide-react';
@@ -5,11 +14,19 @@ import { useStore } from '../context/Store';
 import { CustomDatePicker } from './CustomDatePicker';
 import { RichTextEditor } from './RichTextEditor';
 
+/**
+ * Props for the TaskDetail component.
+ */
 interface TaskDetailProps {
+    /** ID of the task to display, or null if no task selected */
     taskId: string | null;
+    /** Callback to close the detail panel */
     onClose: () => void;
 }
 
+/**
+ * TaskDetail component - Side panel for viewing and editing task details.
+ */
 export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
     const { tasks, updateTask, deleteTask, projects, openModal, addSubtask, toggleSubtask, deleteSubtask, reorderSubtasks, labels: storeLabels, addLabel: addLabelToStore } = useStore();
     const task = tasks.find(t => t.id === taskId);

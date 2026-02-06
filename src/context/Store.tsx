@@ -1,11 +1,37 @@
+/**
+ * @file Store.tsx
+ * @description Global state management for the Stuff application using React Context.
+ *              Provides centralized state for workspaces, projects, tasks, columns,
+ *              custom views, labels, theme settings, and backup functionality.
+ *              Includes localStorage persistence and auto-backup features.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import { Project, Task, ColumnId, ColumnConfig, CustomView, Workspace, Label } from '../types';
 import { exportData, importData, setupAutoBackup, performAutoBackup, verifyBackupPermission } from '../utils/backupUtils';
 
+/**
+ * Available view types for the main content area.
+ */
 export type ViewType = 'board' | 'calendar' | 'analytics' | 'archive';
-export type ViewFilter = 'project' | 'recent' | string; // 'project', 'recent', or custom view ID
+
+/**
+ * View filter types for task filtering.
+ * Can be 'project', 'recent', or a custom view ID string.
+ */
+export type ViewFilter = 'project' | 'recent' | string;
+
+/**
+ * Application theme options.
+ */
 export type Theme = 'light' | 'dark';
 
+/**
+ * Configuration for modal dialogs.
+ * Supports confirm, prompt, and options modal types.
+ */
 interface ModalConfig {
     type: 'confirm' | 'prompt' | 'options';
     title: string;

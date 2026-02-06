@@ -1,8 +1,19 @@
+/**
+ * @file CreateFilterModal.tsx
+ * @description Modal component for creating and editing custom filters.
+ *              Supports filtering by priority level or labels with multi-select.
+ * @author Mishat
+ * @version 1.0.2
+ */
+
 import React, { useState, useEffect } from 'react';
 import { X, Check, Flag, Tag } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { Priority, CustomView } from '../types';
 
+/**
+ * Props for the CreateFilterModal component.
+ */
 interface CreateFilterModalProps {
     onClose: () => void;
     onSave: (name: string, filterType: 'priority' | 'label', filterValue: string | string[]) => void;
