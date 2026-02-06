@@ -11,7 +11,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ColumnConfig, Task } from '../types';
 import { TaskCard } from './TaskCard';
-import { Plus, Trash } from 'lucide-react';
+import { Plus, Trash, ChevronDown } from 'lucide-react';
 import { useStore } from '../context/Store';
 
 /**
@@ -49,11 +49,17 @@ export const Column: React.FC<ColumnProps> = ({ config, tasks, onTaskClick, onAd
 
     const handleTitleSubmit = () => {
         if (title.trim() !== '') {
-            updateColumn(config.id, title);
+            updateColumn(config.id, { title });
         } else {
             setTitle(config.title); // Revert if empty
         }
         setIsEditing(false);
+    };
+
+    const toggleCollapse = () => {
+        if (!isVirtual) {
+            updateColumn(config.id, { isCollapsed: !config.isCollapsed });
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -78,13 +84,21 @@ export const Column: React.FC<ColumnProps> = ({ config, tasks, onTaskClick, onAd
         <div
             ref={setNodeRef}
             className={`
-        flex-shrink-0 w-80 flex flex-col h-full max-h-full rounded-2xl transition-all duration-300
+        flex-shrink-0 w-80 flex flex-col ${config.isCollapsed ? 'h-auto' : 'h-full'} max-h-full rounded-2xl transition-all duration-300
         ${isOver ? 'bg-brand-50/50 dark:bg-brand-900/10 ring-2 ring-brand-500/20' : 'bg-transparent'}
       `}
         >
             {/* Column Header */}
             <div className="px-1 py-3 flex items-center justify-between group">
                 <div className="flex items-center gap-2.5 flex-1">
+                    {!isVirtual && (
+                        <button
+                            onClick={toggleCollapse}
+                            className={`p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors ${config.isCollapsed ? '-rotate-90' : ''}`}
+                        >
+                            <ChevronDown className="w-4 h-4 text-slate-400" />
+                        </button>
+                    )}
                     <div className={`w-3 h-3 rounded-md shadow-sm ${config.color.split(' ')[0]}`}></div>
 
                     {isEditing && !isVirtual ? (
@@ -122,32 +136,36 @@ export const Column: React.FC<ColumnProps> = ({ config, tasks, onTaskClick, onAd
                             <Trash className="w-4 h-4 pointer-events-none" />
                         </button>
                     )}
-                    <button
-                        onClick={onAddTask}
-                        className="p-1.5 hover:bg-white dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-brand-600 shadow-sm transition-all hover:shadow-md"
-                        title="Add Task"
-                    >
-                        <Plus className="w-4 h-4 pointer-events-none" />
-                    </button>
+                    {!config.isCollapsed && (
+                        <button
+                            onClick={onAddTask}
+                            className="p-1.5 hover:bg-white dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-brand-600 shadow-sm transition-all hover:shadow-md"
+                            title="Add Task"
+                        >
+                            <Plus className="w-4 h-4 pointer-events-none" />
+                        </button>
+                    )}
                 </div>
             </div>
 
             {/* Task List */}
-            <div className="flex-1 overflow-y-auto px-1 pb-4 space-y-3 scrollbar-hide">
-                {tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
-                ))}
+            {!config.isCollapsed && (
+                <div className="flex-1 overflow-y-auto px-1 pb-4 space-y-3 scrollbar-hide">
+                    {tasks.map((task) => (
+                        <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
+                    ))}
 
-                {tasks.length === 0 && (
-                    <button
-                        onClick={onAddTask}
-                        className="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:border-brand-300 dark:hover:border-brand-700 hover:bg-brand-50/50 dark:hover:bg-brand-900/10 transition-all group"
-                    >
-                        <Plus className="w-6 h-6 mb-2 text-slate-300 dark:text-slate-700 group-hover:text-brand-500 transition-colors" />
-                        <span className="text-xs font-medium">Add Task</span>
-                    </button>
-                )}
-            </div>
+                    {tasks.length === 0 && (
+                        <button
+                            onClick={onAddTask}
+                            className="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:border-brand-300 dark:hover:border-brand-700 hover:bg-brand-50/50 dark:hover:bg-brand-900/10 transition-all group"
+                        >
+                            <Plus className="w-6 h-6 mb-2 text-slate-300 dark:text-slate-700 group-hover:text-brand-500 transition-colors" />
+                            <span className="text-xs font-medium">Add Task</span>
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

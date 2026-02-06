@@ -35,6 +35,15 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
     const [showLabelSuggestions, setShowLabelSuggestions] = useState(false);
     const [subtaskInput, setSubtaskInput] = useState('');
     const labelInputRef = useRef<HTMLInputElement>(null);
+    const titleInputRef = useRef<HTMLInputElement>(null);
+
+    // Auto-select title for new tasks
+    useEffect(() => {
+        if (task?.title === 'Untitled Task' && titleInputRef.current) {
+            titleInputRef.current.focus();
+            titleInputRef.current.select();
+        }
+    }, [taskId]); // Run when opening a different task
 
     // Close on Escape
     useEffect(() => {
@@ -165,6 +174,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
 
                     {/* Title */}
                     <input
+                        ref={titleInputRef}
                         type="text"
                         value={task.title}
                         onChange={(e) => updateTask(taskId, { title: e.target.value })}

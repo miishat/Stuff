@@ -100,7 +100,7 @@ interface StoreContextType {
     reorderSubtasks: (taskId: string, fromIndex: number, toIndex: number) => void;
 
     addColumn: () => void;
-    updateColumn: (id: string, title: string) => void;
+    updateColumn: (id: string, updates: Partial<ColumnConfig>) => void;
     deleteColumn: (id: string) => void;
 
     addCustomView: (name: string, filterType: 'priority' | 'label', filterValue: string | string[], allWorkspaces?: boolean) => void;
@@ -671,8 +671,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setColumns(prev => [...prev, newCol]);
     }, [activeProjectId, filteredProjects]);
 
-    const updateColumn = useCallback((id: string, title: string) => {
-        setColumns(prev => prev.map(c => c.id === id ? { ...c, title } : c));
+    const updateColumn = useCallback((id: string, updates: Partial<ColumnConfig>) => {
+        setColumns(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
     }, []);
 
     const deleteColumn = useCallback((id: string) => {
