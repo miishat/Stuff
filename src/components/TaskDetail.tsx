@@ -213,7 +213,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId, onClose }) => {
                         {/* Ticket Link */}
                         <div className="flex items-center">
                             <div className="w-32 flex items-center text-slate-500 dark:text-slate-400 text-sm font-medium">
-                                <LinkIcon className="w-4 h-4 mr-3 text-slate-400" /> Ticket Link
+                                <LinkIcon className="w-4 h-4 mr-3 text-slate-400" /> Link
                             </div>
                             <div className="flex-1 flex gap-2">
                                 <input

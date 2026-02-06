@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 interface CustomDatePickerProps {
     value: string | undefined;
-    onChange: (date: string) => void;
+    onChange: (date: string | undefined) => void;
 }
 
 export const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ value, onChange }) => {
@@ -143,6 +143,19 @@ export const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ value, onCha
                                 </button>
                             );
                         })}
+                    </div>
+
+                    {/* Clear Button */}
+                    <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <button
+                            onClick={() => {
+                                onChange(undefined);
+                                setIsOpen(false);
+                            }}
+                            className="w-full py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        >
+                            Clear Date
+                        </button>
                     </div>
                 </div>
             )}
