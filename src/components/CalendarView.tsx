@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Task } from '../types';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useStore } from '../context/Store';
@@ -34,7 +34,7 @@ const DraggableTask = ({ task, onClick, isDone, isOverdue }: { task: Task; onCli
                     onClick(task);
                 }
             }}
-            className={`px-2 py-1.5 border rounded-md text-[11px] font-medium truncate transition-colors touch-none ${isDone
+            className={`px-2 py-1.5 border rounded-md text-[11px] font-medium truncate transition-colors touch-none flex items-center gap-1.5 ${isDone
                 ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 opacity-75'
                 : isOverdue
                     ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40'
@@ -42,7 +42,8 @@ const DraggableTask = ({ task, onClick, isDone, isOverdue }: { task: Task; onCli
                 }`}
             title={task.title}
         >
-            {task.title}
+            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.priority === 'High' ? 'bg-red-500' : task.priority === 'Medium' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+            <span className="truncate">{task.title}</span>
         </div>
     );
 };
@@ -168,10 +169,35 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onTaskClick }) => {
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
         const dayStr = String(day).padStart(2, '0');
         const dateStr = `${year}-${month}-${dayStr}`;
-        return { tasks: tasksByDate.get(dateStr) || [], dateStr };
+
+        const rawTasks = tasksByDate.get(dateStr) || [];
+
+        const priorityOrder: Record<string, number> = { 'High': 3, 'Medium': 2, 'Low': 1 };
+
+        const sortedTasks = [...rawTasks].sort((a, b) => {
+            const isDoneA = doneColumnIds.has(a.columnId);
+            const isDoneB = doneColumnIds.has(b.columnId);
+            if (isDoneA !== isDoneB) return isDoneA ? 1 : -1;
+
+            return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+        });
+
+        return { tasks: sortedTasks, dateStr };
     };
 
     const [expandedDay, setExpandedDay] = useState<number | null>(null);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setExpandedDay(null);
+                setIsScopeMenuOpen(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     return (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>

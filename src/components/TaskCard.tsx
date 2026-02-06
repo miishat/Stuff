@@ -3,6 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { Task } from '../types';
 import { Calendar, Flag, CheckSquare, ChevronDown, ChevronUp, Check, Trash2 } from 'lucide-react';
 import { useStore } from '../context/Store';
+import { stripHtml } from '../utils/text';
 
 interface TaskCardProps {
     task: Task;
@@ -92,7 +93,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
             {/* Description Preview */}
             {task.description && (
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2 leading-relaxed">
-                    {task.description}
+                    {stripHtml(task.description)}
                 </p>
             )}
 
