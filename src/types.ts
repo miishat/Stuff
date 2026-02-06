@@ -116,6 +116,8 @@ export interface ColumnConfig {
     title: string;
     /** Tailwind CSS color classes for the column badge */
     color: string;
+    /** Whether the column is currently collapsed */
+    isCollapsed?: boolean;
 }
 
 /**
