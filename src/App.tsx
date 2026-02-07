@@ -242,23 +242,34 @@ const GlobalLabelsModal: React.FC = () => {
 const GlobalModal: React.FC = () => {
     const { activeModal, closeModal, openModal } = useStore();
     const [inputValue, setInputValue] = useState('');
-    const [visibleOptions, setVisibleOptions] = useState<string[]>([]);
+    const [visibleOptions, setVisibleOptions] = useState<string[] | Record<string, string[]>>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     useEffect(() => {
         if (activeModal?.type === 'prompt') {
             setInputValue(activeModal.defaultValue || '');
         }
         if (activeModal?.type === 'options' && activeModal.options) {
-            // Filter out the current icon (defaultValue) and ensure uniqueness
-            const uniqueOptions = Array.from(new Set(activeModal.options));
-            const availableOptions = activeModal.defaultValue
-                ? uniqueOptions.filter(opt => opt !== activeModal.defaultValue)
-                : uniqueOptions;
+            if (Array.isArray(activeModal.options)) {
+                // Filter out the current icon (defaultValue) and ensure uniqueness
+                const uniqueOptions = Array.from(new Set(activeModal.options));
+                const availableOptions = activeModal.defaultValue
+                    ? uniqueOptions.filter(opt => opt !== activeModal.defaultValue)
+                    : uniqueOptions;
 
-            const shuffled = shuffleArray(availableOptions);
-            setVisibleOptions(shuffled.slice(0, 25));
+                const shuffled = shuffleArray(availableOptions);
+                setVisibleOptions(shuffled.slice(0, 25));
+                setSelectedCategory(null);
+            } else {
+                // Categorized options
+                setVisibleOptions(activeModal.options);
+                // Select first category by default if none is selected
+                if (!selectedCategory && Object.keys(activeModal.options).length > 0) {
+                    setSelectedCategory(Object.keys(activeModal.options)[0]);
+                }
+            }
         }
-    }, [activeModal]);
+    }, [activeModal, selectedCategory]);
 
     // Close on Escape
     useEffect(() => {
@@ -285,7 +296,7 @@ const GlobalModal: React.FC = () => {
     };
 
     const handleShuffle = () => {
-        if (activeModal.options) {
+        if (activeModal.options && Array.isArray(activeModal.options)) {
             // Filter out the current icon (defaultValue) and ensure uniqueness
             const uniqueOptions = Array.from(new Set(activeModal.options));
             const availableOptions = activeModal.defaultValue
@@ -297,15 +308,28 @@ const GlobalModal: React.FC = () => {
         }
     };
 
+    const handleSelectOption = (option: string) => {
+        activeModal.onConfirm(option);
+        closeModal();
+    };
+
+    const isCategorized = activeModal.type === 'options' && !Array.isArray(activeModal.options);
+
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={closeModal}></div>
-            <div className="relative bg-white dark:bg-dark-surface rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-100 border border-slate-200 dark:border-slate-800">
-                <div className="p-6">
-                    {activeModal.type !== 'options' && (
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">{activeModal.title}</h3>
+            <div className={`relative bg-white dark:bg-dark-surface rounded-xl shadow-2xl w-full ${isCategorized ? 'max-w-2xl h-[500px]' : 'max-w-sm'} overflow-hidden animate-in fade-in zoom-in-95 duration-100 border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]`}>
+                <div className={`flex flex-col h-full overflow-hidden ${isCategorized ? '' : 'p-6'}`}>
+
+                    {/* Header for non-categorized or prompt/confirm types */}
+                    {!isCategorized && (
+                        <>
+                            {activeModal.type !== 'options' && (
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">{activeModal.title}</h3>
+                            )}
+                            {activeModal.message && <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">{activeModal.message}</p>}
+                        </>
                     )}
-                    {activeModal.message && <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">{activeModal.message}</p>}
 
                     {activeModal.type === 'prompt' ? (
                         <form onSubmit={handleSubmit}>
@@ -324,51 +348,118 @@ const GlobalModal: React.FC = () => {
                             </div>
                         </form>
                     ) : activeModal.type === 'options' ? (
-                        <div>
-                            <div className="flex justify-between items-center mb-3">
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{activeModal.title}</h3>
-                                <button
-                                    onClick={handleShuffle}
-                                    className="flex items-center gap-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors px-2 py-1 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg"
-                                >
-                                    <RefreshCw className="w-3.5 h-3.5" />
-                                    Shuffle
-                                </button>
+                        isCategorized ? (
+                            <div className="flex h-full">
+                                {/* Left Sidebar: Categories */}
+                                <div className="w-56 bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+                                    <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
+                                        {Object.keys(visibleOptions as Record<string, string[]>).map((category) => (
+                                            <button
+                                                key={category}
+                                                onClick={() => setSelectedCategory(category)}
+                                                className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${selectedCategory === category
+                                                    ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm ring-1 ring-black/5 dark:ring-white/5'
+                                                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-slate-300'
+                                                    }`}
+                                            >
+                                                {category}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Right Content: Emojis */}
+                                <div className="flex-1 flex flex-col h-full overflow-hidden bg-white dark:bg-dark-surface">
+
+
+                                    <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
+                                        {selectedCategory && (visibleOptions as Record<string, string[]>)[selectedCategory] ? (
+                                            <div className="grid grid-cols-7 gap-2">
+                                                {(visibleOptions as Record<string, string[]>)[selectedCategory].map((emoji, index) => (
+                                                    <button
+                                                        key={`${emoji}-${index}`}
+                                                        onClick={() => handleSelectOption(emoji)}
+                                                        className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-center aspect-square"
+                                                    >
+                                                        {emoji}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full text-slate-400">
+                                                Select a category
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/30">
+                                        <button
+                                            onClick={() => {
+                                                const originalConfirm = activeModal.onConfirm;
+                                                openModal({
+                                                    type: 'prompt',
+                                                    title: 'Custom Icon',
+                                                    message: 'Enter any emoji or text (max 2 chars recommended):',
+                                                    defaultValue: activeModal.defaultValue,
+                                                    confirmLabel: 'Set Icon',
+                                                    onConfirm: originalConfirm
+                                                });
+                                            }}
+                                            className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-2"
+                                        >
+                                            <span>✨</span> Use Custom...
+                                        </button>
+                                        <button onClick={closeModal} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">Cancel</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="grid grid-cols-5 gap-2 mb-4">
-                                {visibleOptions.map((option) => (
+                        ) : (
+                            <div className="flex flex-col overflow-hidden">
+                                <div className="flex justify-between items-center mb-3 flex-shrink-0">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{activeModal.title}</h3>
                                     <button
-                                        key={option}
-                                        onClick={() => {
-                                            activeModal.onConfirm(option);
-                                            closeModal();
-                                        }}
-                                        className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-center aspect-square"
+                                        onClick={handleShuffle}
+                                        className="flex items-center gap-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors px-2 py-1 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg"
                                     >
-                                        {option}
+                                        <RefreshCw className="w-3.5 h-3.5" />
+                                        Shuffle
                                     </button>
-                                ))}
+                                </div>
+                                <div className="overflow-y-auto p-1 scrollbar-thin">
+                                    <div className="grid grid-cols-5 gap-2 mb-4">
+                                        {(visibleOptions as string[]).map((option) => (
+                                            <button
+                                                key={option}
+                                                onClick={() => handleSelectOption(option)}
+                                                className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-center aspect-square"
+                                            >
+                                                {option}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center mt-4 border-t border-slate-100 dark:border-slate-800 pt-4 flex-shrink-0">
+                                    <button
+                                        onClick={() => {
+                                            const originalConfirm = activeModal.onConfirm;
+                                            openModal({
+                                                type: 'prompt',
+                                                title: 'Custom Icon',
+                                                message: 'Enter any emoji or text (max 2 chars recommended):',
+                                                defaultValue: activeModal.defaultValue,
+                                                confirmLabel: 'Set Icon',
+                                                onConfirm: originalConfirm
+                                            });
+                                        }}
+                                        className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
+                                    >
+                                        Use Custom...
+                                    </button>
+                                    <button onClick={closeModal} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">Cancel</button>
+                                </div>
                             </div>
-                            <div className="flex justify-between items-center mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <button
-                                    onClick={() => {
-                                        const originalConfirm = activeModal.onConfirm;
-                                        openModal({
-                                            type: 'prompt',
-                                            title: 'Custom Icon',
-                                            message: 'Enter any emoji or text (max 2 chars recommended):',
-                                            defaultValue: activeModal.defaultValue,
-                                            confirmLabel: 'Set Icon',
-                                            onConfirm: originalConfirm
-                                        });
-                                    }}
-                                    className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
-                                >
-                                    Use Custom...
-                                </button>
-                                <button onClick={closeModal} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">Cancel</button>
-                            </div>
-                        </div>
+                        )
                     ) : (
                         <div className="flex gap-3 justify-end mt-6">
                             <button onClick={closeModal} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">Cancel</button>
