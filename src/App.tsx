@@ -240,7 +240,7 @@ const GlobalLabelsModal: React.FC = () => {
 }
 
 const GlobalModal: React.FC = () => {
-    const { activeModal, closeModal } = useStore();
+    const { activeModal, closeModal, openModal } = useStore();
     const [inputValue, setInputValue] = useState('');
     const [visibleOptions, setVisibleOptions] = useState<string[]>([]);
 
@@ -349,7 +349,23 @@ const GlobalModal: React.FC = () => {
                                     </button>
                                 ))}
                             </div>
-                            <div className="flex justify-end">
+                            <div className="flex justify-between items-center mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                                <button
+                                    onClick={() => {
+                                        const originalConfirm = activeModal.onConfirm;
+                                        openModal({
+                                            type: 'prompt',
+                                            title: 'Custom Icon',
+                                            message: 'Enter any emoji or text (max 2 chars recommended):',
+                                            defaultValue: activeModal.defaultValue,
+                                            confirmLabel: 'Set Icon',
+                                            onConfirm: originalConfirm
+                                        });
+                                    }}
+                                    className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
+                                >
+                                    Use Custom...
+                                </button>
                                 <button onClick={closeModal} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">Cancel</button>
                             </div>
                         </div>
