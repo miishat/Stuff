@@ -4,7 +4,7 @@
  *              Displays task summary including priority, labels, due date,
  *              subtask progress, and supports drag-and-drop functionality.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState } from 'react';

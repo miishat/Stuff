@@ -4,7 +4,7 @@
  *              Allows creating, renaming, recoloring, and deleting labels.
  *              Features a 30-color palette for label customization.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState } from 'react';

@@ -3,7 +3,7 @@
  * @description Application entry point for Stuff task management app.
  *              Bootstraps the React application and mounts it to the DOM.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React from 'react'

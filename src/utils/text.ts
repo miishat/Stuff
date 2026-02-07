@@ -3,7 +3,7 @@
  * @description Text utility functions for the Stuff application.
  *              Provides helper functions for text manipulation and sanitization.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 /**

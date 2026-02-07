@@ -4,7 +4,7 @@
  *              This file contains the root App component, settings modal, global modals,
  *              and orchestrates the overall application structure.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState, useEffect } from 'react';
@@ -224,7 +224,7 @@ const SettingsModal: React.FC = () => {
                     </div>
 
                     <div className="pt-4 text-center text-xs text-slate-400 dark:text-slate-600 font-mono">
-                        <div>Stuff v1.0.2</div>
+                        <div>Stuff v1.0.3</div>
                         <div className="mt-1">Made by <a href="https://github.com/miishat" target="_blank" rel="noopener noreferrer" className="hover:text-brand-500 transition-colors">@Mishat</a></div>
                     </div>
                 </div>

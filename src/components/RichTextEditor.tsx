@@ -3,7 +3,7 @@
  * @description Rich text editor component using TipTap library.
  *              Provides formatting toolbar with bold, italic, lists, links, and undo/redo.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React from 'react';

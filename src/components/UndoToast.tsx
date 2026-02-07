@@ -3,7 +3,7 @@
  * @description Toast notification component for undo archive action.
  *              Displays at bottom of screen with undo button after task archival.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React from 'react';

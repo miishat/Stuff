@@ -5,7 +5,7 @@
  *              custom views, labels, theme settings, and backup functionality.
  *              Includes localStorage persistence and auto-backup features.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';

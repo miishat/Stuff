@@ -4,7 +4,7 @@
  *              Provides functionality for manual data export/import and
  *              automatic local folder backup using the File System Access API.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 /**

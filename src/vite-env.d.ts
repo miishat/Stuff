@@ -3,7 +3,7 @@
  * @description Vite environment type declarations for the Stuff application.
  *              Provides TypeScript type support for Vite and PWA plugin features.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 /// <reference types="vite/client" />

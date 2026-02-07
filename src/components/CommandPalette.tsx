@@ -4,7 +4,7 @@
  *              Provides quick access to navigation, projects, filters,
  *              theme switching, data export/import, and workspace management.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useEffect, useState } from 'react';

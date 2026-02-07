@@ -3,7 +3,7 @@
  * @description Custom date picker component with calendar popup.
  *              Provides month navigation, visual day selection, and date clearing.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState, useRef, useEffect } from 'react';

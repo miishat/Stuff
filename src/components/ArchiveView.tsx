@@ -3,7 +3,7 @@
  * @description Archive view component for managing deleted tasks.
  *              Allows viewing, restoring, and permanently deleting archived tasks.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React from 'react';

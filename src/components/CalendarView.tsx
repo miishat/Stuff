@@ -4,7 +4,7 @@
  *              Displays tasks by due date with drag-and-drop date reassignment,
  *              scope filtering (project/workspace/all), and day expansion.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useMemo, useState, useEffect } from 'react';

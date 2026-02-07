@@ -4,7 +4,7 @@
  *              Contains all core data models including tasks, projects, workspaces,
  *              columns, labels, and custom views.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 /**

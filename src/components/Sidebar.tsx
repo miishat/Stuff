@@ -4,7 +4,7 @@
  *              Provides workspace switching, project navigation, custom filter
  *              views, and settings access with smooth open/collapse animations.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState, useRef, useEffect } from 'react';

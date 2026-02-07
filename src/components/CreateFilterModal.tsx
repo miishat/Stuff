@@ -3,7 +3,7 @@
  * @description Modal component for creating and editing custom filters.
  *              Supports filtering by priority level or labels with multi-select.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState, useEffect } from 'react';

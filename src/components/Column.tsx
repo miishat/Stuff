@@ -4,7 +4,7 @@
  *              Renders a droppable column with header, task list, and add task button.
  *              Supports inline editing of column titles and deletion.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState, useRef, useEffect } from 'react';

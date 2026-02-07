@@ -4,7 +4,7 @@
  *              Handles drag-and-drop task management, view switching between
  *              board/calendar/analytics views, and task filtering.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useState, useMemo } from 'react';

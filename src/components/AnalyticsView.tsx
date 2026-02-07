@@ -4,7 +4,7 @@
  *              Displays KPI cards, priority breakdown charts, and upcoming tasks
  *              with scope filtering (project/workspace/all).
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useMemo, useState } from 'react';

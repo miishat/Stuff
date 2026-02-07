@@ -4,7 +4,7 @@
  *              Prompts users when a new service worker is available
  *              and allows immediate update or dismissal.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import { useEffect, useState } from 'react';

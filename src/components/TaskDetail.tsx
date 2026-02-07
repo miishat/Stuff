@@ -4,7 +4,7 @@
  *              Provides full task editing including title, description (rich text),
  *              priority, due date, labels, ticket links, and subtasks.
  * @author Mishat
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 import React, { useEffect, useState, useRef } from 'react';
