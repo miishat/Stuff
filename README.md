@@ -90,5 +90,3 @@ Make **Stuff** your own:
 
 ## 🤝 Acknowledgments
 Special thanks to **Antigravity** and **Jules** for *'their'* assistance in writing code and implementing many of the features in this application.
-
-*Made with ❤️ by Mishat*
