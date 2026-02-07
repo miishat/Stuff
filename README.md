@@ -88,4 +88,7 @@ Make **Stuff** your own:
     - Hover over any project in the sidebar.
     - Click the icon (e.g., 📁) to open the emoji picker and choose a new one.
 
+## 🤝 Acknowledgments
+Special thanks to **Antigravity** and **Jules** for *'their'* assistance in writing code and implementing many of the features in this application.
+
 *Made with ❤️ by Mishat*
